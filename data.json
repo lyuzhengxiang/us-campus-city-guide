@@ -1,0 +1,560 @@
+{
+  "metadata": {
+    "title": "Best Places to Visit Near Top US Universities",
+    "description": "A curated guide to the best attractions, landmarks, and experiences near the top 10 nationally ranked US universities.",
+    "rankingSource": "U.S. News & World Report 2026 Best National Universities",
+    "lastUpdated": "2026-03-30"
+  },
+  "universities": [
+    {
+      "rank": 1,
+      "name": "Princeton University",
+      "location": {
+        "city": "Princeton",
+        "state": "New Jersey",
+        "coordinates": { "lat": 40.3431, "lng": -74.6551 }
+      },
+      "description": "Founded in 1746, Princeton is one of America's oldest and most prestigious universities, renowned for its commitment to undergraduate teaching, world-class research, and its stunning Gothic campus set in a charming New Jersey college town.",
+      "image": "princeton.jpg",
+      "placesToVisit": [
+        {
+          "name": "Princeton University Art Museum",
+          "type": "Museum",
+          "description": "Founded in 1882 with over 92,000 works spanning antiquity to contemporary art, this free museum on campus features collections ranging from Chinese paintings to modern American art in a beautifully renovated space.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Palmer Square",
+          "type": "Shopping & Dining District",
+          "description": "Princeton's charming village-within-a-village features an array of boutiques, restaurants, and cafes tucked into Tudor-style buildings around a grassy green and the historic Nassau Inn.",
+          "distanceFromCampus": "0.2 miles"
+        },
+        {
+          "name": "Princeton Battlefield State Park",
+          "type": "Historic Site & Park",
+          "description": "The site of the pivotal January 1777 Battle of Princeton during the American Revolutionary War, where George Washington's forces defeated the British. A serene park with monuments and walking trails.",
+          "distanceFromCampus": "1.5 miles"
+        },
+        {
+          "name": "Morven Museum & Garden",
+          "type": "Historic House Museum",
+          "description": "A National Historic Landmark on 5 pristine acres, this was the home of Richard Stockton, a signer of the Declaration of Independence, and a former New Jersey Governor's Mansion.",
+          "distanceFromCampus": "0.5 miles"
+        },
+        {
+          "name": "McCarter Theatre Center",
+          "type": "Performing Arts Venue",
+          "description": "Princeton's Tony Award-winning regional theater presents world-class drama, dance, music, and comedy performances year-round, and is considered one of the leading performing arts centers in New Jersey.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "D&R Canal State Park",
+          "type": "Nature & Recreation",
+          "description": "Over 70 miles of multi-use trails along a historic 19th-century canal offer scenic walking, biking, jogging, and kayaking through beautiful New Jersey countryside.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Nassau Street",
+          "type": "Historic Main Street",
+          "description": "The main thoroughfare through Princeton's downtown, lined with independent bookstores, acclaimed restaurants like Mediterra, and artisan ice cream shops including The Bent Spoon and Thomas Sweet.",
+          "distanceFromCampus": "0.1 miles"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "name": "Massachusetts Institute of Technology (MIT)",
+      "location": {
+        "city": "Cambridge",
+        "state": "Massachusetts",
+        "coordinates": { "lat": 42.3601, "lng": -71.0942 }
+      },
+      "description": "Founded in 1861, MIT is the world's leading institution for science, technology, engineering, and mathematics, known for its cutting-edge research, innovative spirit, and an iconic campus along the Charles River featuring buildings by renowned architects like Frank Gehry and I.M. Pei.",
+      "image": "mit.jpg",
+      "placesToVisit": [
+        {
+          "name": "MIT Museum",
+          "type": "Museum",
+          "description": "Reopened in a stunning new Kendall Square location in 2022, this hands-on museum showcases MIT's groundbreaking innovations in robotics, holography, artificial intelligence, and the intersection of art and science.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Charles River Esplanade",
+          "type": "Waterfront Park",
+          "description": "A 950-acre nature reservation along the Charles River with scenic jogging and cycling paths, sailing opportunities, and the famous Hatch Memorial Shell for outdoor concerts, offering stunning views of the Boston skyline.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "Kendall Square",
+          "type": "Innovation District",
+          "description": "Known as 'the most innovative square mile on the planet,' this vibrant neighborhood adjacent to MIT is home to hundreds of biotech and tech companies, trendy restaurants, and a thriving startup culture.",
+          "distanceFromCampus": "0.2 miles"
+        },
+        {
+          "name": "Harvard Square",
+          "type": "Historic Shopping & Cultural District",
+          "description": "Visited by over 8 million people annually, this iconic square is packed with independent bookstores (including Harvard Book Store), eclectic restaurants, street performers, and historic Harvard University just a short walk away.",
+          "distanceFromCampus": "1.5 miles"
+        },
+        {
+          "name": "Museum of Science",
+          "type": "Museum",
+          "description": "One of Boston's premier attractions, this world-class museum features hundreds of interactive exhibits spanning astronomy, technology, natural history, and human biology, plus a planetarium and IMAX theater.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Freedom Trail",
+          "type": "Historic Walking Tour",
+          "description": "A 2.5-mile red-brick walking trail through 16 of Boston's most significant historic sites, including Paul Revere's House, the Old North Church, and Faneuil Hall, bringing the American Revolution to life.",
+          "distanceFromCampus": "2 miles"
+        },
+        {
+          "name": "Fenway Park",
+          "type": "Sports Landmark",
+          "description": "Home to the Boston Red Sox since 1912, Fenway is America's oldest Major League Baseball park, famous for its iconic 37-foot 'Green Monster' left-field wall. Tours are available year-round.",
+          "distanceFromCampus": "3 miles"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "name": "Harvard University",
+      "location": {
+        "city": "Cambridge",
+        "state": "Massachusetts",
+        "coordinates": { "lat": 42.3770, "lng": -71.1167 }
+      },
+      "description": "Founded in 1636, Harvard is the oldest institution of higher education in the United States and among the most prestigious in the world, with an unparalleled endowment, a sprawling campus in historic Cambridge, and an alumni network that includes eight U.S. presidents.",
+      "image": "harvard.jpg",
+      "placesToVisit": [
+        {
+          "name": "Harvard Yard & John Harvard Statue",
+          "type": "Historic Campus Landmark",
+          "description": "The heart of Harvard's campus features buildings dating to 1720, including Massachusetts Hall and Widener Library. The iconic John Harvard statue is one of the most photographed landmarks in Boston -- tradition says rubbing his foot brings good luck.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Harvard Art Museums",
+          "type": "Art Museum",
+          "description": "Three world-class museums -- the Fogg, Busch-Reisinger, and Arthur M. Sackler -- united under a stunning Renzo Piano glass roof, housing masterworks from antiquity to the present across European, Asian, and American art.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Harvard Museum of Natural History",
+          "type": "Natural History Museum",
+          "description": "Home to dinosaur skeletons, a massive whale skeleton, the world's largest turtle shell, and the world-famous Blaschka Glass Flowers -- over 4,000 exquisitely realistic glass botanical models created between 1887 and 1936.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "Mount Auburn Cemetery",
+          "type": "Historic Landmark & Nature",
+          "description": "America's first landscaped cemetery (1831) and a National Historic Landmark, featuring 175 acres of gorgeous gardens, 5,000+ trees, and the resting places of Henry Wadsworth Longfellow and Winslow Homer. Climb Washington Tower for panoramic views of Cambridge and Boston.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Harvard Square",
+          "type": "Shopping & Cultural District",
+          "description": "An iconic urban square featuring independent bookstores, sidewalk cafes, street musicians, and shops ranging from quirky vintage stores to the legendary Harvard Coop. A cultural crossroads alive with energy day and night.",
+          "distanceFromCampus": "Adjacent to campus"
+        },
+        {
+          "name": "Peabody Museum of Archaeology and Ethnology",
+          "type": "Museum",
+          "description": "Founded in 1866, one of the oldest anthropology museums in the world, housing over 1 million artifacts including the largest surviving collection from the Lewis and Clark Expedition of 1804-1806.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "Charles River Bike Path",
+          "type": "Outdoor Recreation",
+          "description": "Miles of scenic paths along both banks of the Charles River, perfect for running, cycling, and rowing, with beautiful views of the Boston and Cambridge skylines. Popular with students and locals year-round.",
+          "distanceFromCampus": "0.5 miles"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "name": "Stanford University",
+      "location": {
+        "city": "Stanford (Palo Alto)",
+        "state": "California",
+        "coordinates": { "lat": 37.4275, "lng": -122.1697 }
+      },
+      "description": "Founded in 1885 in the heart of Silicon Valley, Stanford is a world leader in entrepreneurship, technology, and research, boasting a sprawling 8,180-acre campus -- one of the largest in the nation -- with iconic sandstone buildings, palm-lined boulevards, and a culture of innovation.",
+      "image": "stanford.jpg",
+      "placesToVisit": [
+        {
+          "name": "Cantor Arts Center & Rodin Sculpture Garden",
+          "type": "Art Museum & Sculpture Garden",
+          "description": "A 130,000-square-foot museum housing over 38,000 works including the largest collection of Auguste Rodin bronze sculptures outside Paris, plus impressive African, Native American, and Asian art collections -- all free to the public.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Hoover Tower",
+          "type": "Campus Landmark & Observation Deck",
+          "description": "The 285-foot iconic tower houses the Hoover Institution Library and Archives, founded by President Herbert Hoover. Visitors can ascend to the observation deck for a breathtaking 360-degree panoramic view of the Bay Area.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "The Stanford Dish Trail",
+          "type": "Hiking Trail",
+          "description": "A beloved 3.5-mile paved loop trail through the golden foothills behind campus, offering sweeping views of the Bay Area and passing a retired radio telescope dish. Popular with runners, walkers, and Stanford students alike.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Stanford Memorial Church",
+          "type": "Historic Landmark",
+          "description": "A stunning non-denominational church at the heart of campus, featuring breathtaking Venetian mosaics, stained glass windows, and Romanesque-Byzantine architecture that makes it one of the most photographed buildings on the West Coast.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Computer History Museum",
+          "type": "Technology Museum",
+          "description": "Located in nearby Mountain View, this fascinating museum traces the history of computing from the abacus to AI, with interactive exhibits including a working Babbage Engine and Google's first server rack.",
+          "distanceFromCampus": "5 miles"
+        },
+        {
+          "name": "Palo Alto Baylands Nature Preserve",
+          "type": "Nature Preserve",
+          "description": "The largest tract of undisturbed marshland in the San Francisco Bay, with 15 miles of trails winding past tidal and freshwater habitats across 1,940 acres. Spectacular for birdwatching and sunset views.",
+          "distanceFromCampus": "3 miles"
+        },
+        {
+          "name": "University Avenue (Downtown Palo Alto)",
+          "type": "Shopping & Dining District",
+          "description": "The vibrant main street connecting campus to downtown Palo Alto, lined with acclaimed restaurants, boutiques, sidewalk cafes, and tech startup offices, embodying the unique blend of Silicon Valley innovation and California charm.",
+          "distanceFromCampus": "0.5 miles"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "name": "Yale University",
+      "location": {
+        "city": "New Haven",
+        "state": "Connecticut",
+        "coordinates": { "lat": 41.3163, "lng": -72.9223 }
+      },
+      "description": "Founded in 1701, Yale is one of America's most storied Ivy League universities, celebrated for its exceptional arts and humanities programs, its stunning collegiate Gothic architecture, and a vibrant campus deeply intertwined with the cultural life of New Haven.",
+      "image": "yale.jpg",
+      "placesToVisit": [
+        {
+          "name": "Yale University Art Gallery",
+          "type": "Art Museum",
+          "description": "The oldest university art museum in the United States, with over 300,000 works spanning ancient Egypt to the present, including masterpieces by van Gogh, Manet, Picasso, and Hopper. Free admission in a landmark Louis Kahn building.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Beinecke Rare Book & Manuscript Library",
+          "type": "Library & Architectural Landmark",
+          "description": "An architectural icon designed by Gordon Bunshaft, with translucent marble panels that glow with natural light. Houses one of the world's largest collections of rare books and manuscripts, including a Gutenberg Bible.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Yale Peabody Museum of Natural History",
+          "type": "Natural History Museum",
+          "description": "Recently renovated, this beloved museum features a 67-foot Brontosaurus skeleton, dazzling mineral collections, and hands-on exhibits spanning dinosaurs, ancient civilizations, and Connecticut wildlife.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "New Haven Green",
+          "type": "Historic Park",
+          "description": "A 16-acre National Historic Landmark and one of New England's oldest town greens, flanked by three historic churches and serving as the venue for the New Haven Jazz Festival, food festivals, and community events.",
+          "distanceFromCampus": "Adjacent to campus"
+        },
+        {
+          "name": "Wooster Street (New Haven Apizza)",
+          "type": "Restaurant District",
+          "description": "The legendary home of New Haven-style apizza, a unique thin-crust pizza tradition. Frank Pepe Pizzeria Napoletana (since 1925) and Sally's Apizza are pilgrimage-worthy destinations for pizza lovers worldwide.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Yale Center for British Art",
+          "type": "Art Museum",
+          "description": "The largest and most comprehensive collection of British art outside the United Kingdom, housed in the last building designed by architect Louis Kahn. Features works by Turner, Constable, and Gainsborough. Free admission.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "East Rock Park",
+          "type": "Nature & Scenic Viewpoint",
+          "description": "A dramatic 365-foot basalt ridge offering hiking trails and one of the best panoramic views in Connecticut -- overlooking New Haven, Long Island Sound, and the Yale campus from its summit.",
+          "distanceFromCampus": "2 miles"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "University of Chicago",
+      "location": {
+        "city": "Chicago",
+        "state": "Illinois",
+        "coordinates": { "lat": 41.7886, "lng": -87.5987 }
+      },
+      "description": "Founded in 1890 with funding from John D. Rockefeller, the University of Chicago is renowned for its rigorous intellectual culture, groundbreaking research across the sciences and humanities, and a stunning Gothic campus in the historic Hyde Park neighborhood on Chicago's South Side.",
+      "image": "uchicago.jpg",
+      "placesToVisit": [
+        {
+          "name": "Frank Lloyd Wright's Robie House",
+          "type": "Architectural Landmark (UNESCO World Heritage Site)",
+          "description": "A masterpiece of Prairie School architecture designed by Frank Lloyd Wright in 1910, featuring dramatic cantilevered roofs and art glass windows. A UNESCO World Heritage Site located steps from the UChicago campus.",
+          "distanceFromCampus": "Adjacent to campus"
+        },
+        {
+          "name": "Griffin Museum of Science and Industry",
+          "type": "Science Museum",
+          "description": "The largest science museum in the Western Hemisphere, housed in a stunning 1893 World's Fair building, with over 2,000 exhibits including a captured German U-505 submarine, a coal mine replica, and a full-size Boeing 727.",
+          "distanceFromCampus": "0.5 miles"
+        },
+        {
+          "name": "Promontory Point",
+          "type": "Lakefront Park & Scenic Viewpoint",
+          "description": "A man-made peninsula jutting into Lake Michigan, offering some of the most breathtaking views of the Chicago skyline. A beloved spot for picnics, sunset watching, and summer barbecues.",
+          "distanceFromCampus": "0.7 miles"
+        },
+        {
+          "name": "Seminary Co-op Bookstore",
+          "type": "Independent Bookstore",
+          "description": "World-famous academic bookstore with over 100,000 titles, widely regarded as one of the best bookstores in America. A haven for scholars and bibliophiles, reflecting UChicago's intense intellectual culture.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Rockefeller Memorial Chapel",
+          "type": "Historic Chapel & Concert Venue",
+          "description": "The tallest building on campus, this magnificent Gothic chapel features stunning stained glass windows, intricate stone carvings, and hosts renowned organ and carillon concerts throughout the year.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Osaka Garden in Jackson Park",
+          "type": "Japanese Garden",
+          "description": "A serene Japanese garden on a secluded island in Jackson Park, featuring a traditional moon bridge, tranquil lagoons, and lush plantings -- a peaceful escape originally created for the 1893 World's Columbian Exposition.",
+          "distanceFromCampus": "0.8 miles"
+        },
+        {
+          "name": "Court Theatre",
+          "type": "Professional Theater",
+          "description": "Named 'the most consistently excellent theater company in America' by the Wall Street Journal, this Tony Award-winning resident professional theater on campus presents bold interpretations of classic and contemporary works.",
+          "distanceFromCampus": "On campus"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "Duke University",
+      "location": {
+        "city": "Durham",
+        "state": "North Carolina",
+        "coordinates": { "lat": 36.0014, "lng": -78.9382 }
+      },
+      "description": "Founded in 1838 and rechartered in 1924, Duke is a top-tier research university set on a beautiful 8,610-acre campus in Durham, North Carolina, known for its neo-Gothic architecture, powerhouse athletics (especially basketball), and the renowned Duke University Health System.",
+      "image": "duke.jpg",
+      "placesToVisit": [
+        {
+          "name": "Sarah P. Duke Gardens",
+          "type": "Botanical Garden",
+          "description": "Recognized among the top 10 public gardens in the U.S., these 55 acres in the heart of campus feature terraced gardens, a Japanese-inspired Asiatic Arboretum, native plant collections, and five miles of walking paths.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Duke University Chapel",
+          "type": "Historic Chapel & Landmark",
+          "description": "A breathtaking neo-Gothic chapel with a soaring 210-foot tower, 77 stained glass windows, and a 5,000-pipe Flentrop organ. Built in the 1930s, it is the centerpiece of Duke's West Campus and welcomes visitors daily.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Duke Lemur Center",
+          "type": "Wildlife Sanctuary & Research Center",
+          "description": "Home to over 200 lemurs across 14 species, this is the world's largest and most diverse collection of lemurs outside Madagascar. Guided tours offer a rare close encounter with these endangered primates.",
+          "distanceFromCampus": "2 miles"
+        },
+        {
+          "name": "Nasher Museum of Art",
+          "type": "Art Museum",
+          "description": "A striking modern building by architect Rafael Vinoly housing over 10,000 works of art, with strengths in pre-Columbian, medieval, and contemporary art with a focus on the African diaspora. Free admission.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "American Tobacco Campus",
+          "type": "Historic District & Entertainment Venue",
+          "description": "A beautifully restored historic tobacco warehouse district that is now Durham's vibrant hub for dining, live entertainment, and cultural events, anchoring the city's revitalized downtown.",
+          "distanceFromCampus": "2 miles"
+        },
+        {
+          "name": "Durham Bulls Athletic Park",
+          "type": "Sports Venue",
+          "description": "Home to the Durham Bulls (Triple-A baseball), made famous by the movie 'Bull Durham.' The 10,000-seat stadium features a 32-foot wall and a towering mechanical bull -- a quintessential Durham experience.",
+          "distanceFromCampus": "3 miles"
+        },
+        {
+          "name": "Eno River State Park",
+          "type": "State Park & Nature",
+          "description": "A tranquil natural escape just 10 miles from campus, offering hiking trails along the scenic Eno River, swimming holes, picnic areas, and paddling opportunities through forested North Carolina piedmont landscape.",
+          "distanceFromCampus": "10 miles"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "Johns Hopkins University",
+      "location": {
+        "city": "Baltimore",
+        "state": "Maryland",
+        "coordinates": { "lat": 39.3299, "lng": -76.6205 }
+      },
+      "description": "Founded in 1876 as America's first research university, Johns Hopkins pioneered the model of graduate education in the United States and remains a global leader in medicine, public health, and scientific research, with its historic Homewood campus set in northern Baltimore.",
+      "image": "johnshopkins.jpg",
+      "placesToVisit": [
+        {
+          "name": "Baltimore Museum of Art",
+          "type": "Art Museum",
+          "description": "Adjacent to the Homewood campus, this world-class museum houses over 97,000 works including the renowned Cone Collection of Matisse and Picasso, plus beautiful outdoor sculpture gardens. Free admission.",
+          "distanceFromCampus": "Adjacent to campus"
+        },
+        {
+          "name": "George Peabody Library",
+          "type": "Historic Library",
+          "description": "Often called the 'Cathedral of Books,' this jaw-droppingly beautiful library features a soaring 61-foot atrium with ornate cast-iron balconies, housing 300,000 volumes. Part of the Johns Hopkins network and one of the most photographed libraries in the world.",
+          "distanceFromCampus": "3 miles (Peabody campus)"
+        },
+        {
+          "name": "National Aquarium",
+          "type": "Aquarium",
+          "description": "Standing seven stories high and capped by a glass pyramid at Baltimore's Inner Harbor, this is widely regarded as one of America's best aquariums, featuring over 20,000 animals including sharks, dolphins, and a rooftop rainforest.",
+          "distanceFromCampus": "4 miles"
+        },
+        {
+          "name": "Fort McHenry National Monument",
+          "type": "Historic Site",
+          "description": "The birthplace of 'The Star-Spangled Banner,' where Francis Scott Key witnessed the British bombardment in 1814. This star-shaped fort offers living history exhibits, ranger programs, and sweeping harbor views.",
+          "distanceFromCampus": "6 miles"
+        },
+        {
+          "name": "Oriole Park at Camden Yards",
+          "type": "Sports Landmark",
+          "description": "The ballpark that revolutionized modern stadium design, home to the Baltimore Orioles since 1992. Its retro-classic architecture incorporates a historic B&O Railroad warehouse and set the standard for every MLB park built since.",
+          "distanceFromCampus": "4 miles"
+        },
+        {
+          "name": "American Visionary Art Museum",
+          "type": "Art Museum",
+          "description": "A one-of-a-kind museum dedicated to self-taught 'outsider art,' featuring wildly creative and unconventional works. Also hosts the annual Kinetic Sculpture Race, where human-powered art machines race over land and water.",
+          "distanceFromCampus": "5 miles"
+        },
+        {
+          "name": "Fell's Point",
+          "type": "Historic Waterfront Neighborhood",
+          "description": "A charming cobblestoned waterfront neighborhood dating to 1726, once a shipbuilding hub, now packed with eclectic restaurants, pubs, boutiques, and the Broadway Market -- Baltimore's most atmospheric neighborhood for a stroll.",
+          "distanceFromCampus": "4 miles"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "Northwestern University",
+      "location": {
+        "city": "Evanston",
+        "state": "Illinois",
+        "coordinates": { "lat": 42.0565, "lng": -87.6753 }
+      },
+      "description": "Founded in 1851, Northwestern is a prestigious research university uniquely situated on the shores of Lake Michigan just north of Chicago, renowned for its top-ranked programs in journalism (Medill), performing arts, engineering, and business (Kellogg).",
+      "image": "northwestern.jpg",
+      "placesToVisit": [
+        {
+          "name": "Lake Michigan Shoreline & Campus Beaches",
+          "type": "Waterfront & Beaches",
+          "description": "Northwestern's campus sits directly on Lake Michigan, offering rare lakefront access with sandy beaches, sailing, kayaking, and paddleboarding. Clark Street Beach is a popular summer destination just minutes from campus.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Block Museum of Art",
+          "type": "Art Museum",
+          "description": "A free museum on campus featuring a 5,000-item permanent collection with works by Andy Warhol, Mary Cassatt, and Edward Steichen, plus rotating exhibitions and an outdoor sculpture walk with 16 installations.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Grosse Point Lighthouse",
+          "type": "Historic Landmark",
+          "description": "An 1873 lighthouse on Evanston's Lake Michigan shoreline, designated a National Historic Landmark. Visitors can climb to the top for stunning lake views on summer weekends and explore the maritime history museum.",
+          "distanceFromCampus": "0.5 miles"
+        },
+        {
+          "name": "Downtown Evanston",
+          "type": "Shopping & Dining District",
+          "description": "A vibrant downtown just steps from campus, featuring diverse restaurants (from Japanese street food to French bistros), craft breweries, art galleries, boutiques, and the lively Fountain Square with seasonal events and farmers markets.",
+          "distanceFromCampus": "0.5 miles"
+        },
+        {
+          "name": "Mitchell Museum of the American Indian",
+          "type": "Museum",
+          "description": "One of only a few museums in the country dedicated exclusively to the art, history, and culture of Native American and First Nation peoples, featuring artifacts from across the U.S. and Canada.",
+          "distanceFromCampus": "1 mile"
+        },
+        {
+          "name": "Chicago (via CTA/Metra)",
+          "type": "World-Class City",
+          "description": "Just a 30-minute train ride south, downtown Chicago offers the Art Institute, Millennium Park, Navy Pier, the Magnificent Mile, deep-dish pizza, world-class architecture, and an unrivaled music and comedy scene.",
+          "distanceFromCampus": "12 miles"
+        },
+        {
+          "name": "Shakespeare Garden",
+          "type": "Garden & Campus Green Space",
+          "description": "A charming garden on Northwestern's campus planted with flowers and herbs mentioned in Shakespeare's plays, offering a peaceful retreat with Lake Michigan views -- a hidden gem beloved by students and visitors.",
+          "distanceFromCampus": "On campus"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "University of Pennsylvania",
+      "location": {
+        "city": "Philadelphia",
+        "state": "Pennsylvania",
+        "coordinates": { "lat": 39.9522, "lng": -75.1932 }
+      },
+      "description": "Founded by Benjamin Franklin in 1740, Penn is one of the original Ivy League universities and a pioneer of interdisciplinary education, situated in Philadelphia's University City neighborhood with easy access to one of America's most historically significant cities.",
+      "image": "upenn.jpg",
+      "placesToVisit": [
+        {
+          "name": "Penn Museum (University Museum of Archaeology and Anthropology)",
+          "type": "Museum",
+          "description": "One of the world's great archaeology and anthropology museums, housing over 1 million artifacts including a 3,000-year-old Egyptian Sphinx -- the largest in the Western Hemisphere -- and treasures from Mesopotamia, China, and the Americas.",
+          "distanceFromCampus": "On campus"
+        },
+        {
+          "name": "Independence Hall & Liberty Bell",
+          "type": "Historic Landmark",
+          "description": "The birthplace of American democracy where both the Declaration of Independence and the U.S. Constitution were debated and signed. The nearby Liberty Bell Center houses the iconic cracked bell. A UNESCO World Heritage Site.",
+          "distanceFromCampus": "2 miles"
+        },
+        {
+          "name": "Philadelphia Museum of Art",
+          "type": "Art Museum",
+          "description": "One of America's largest and finest art museums, with over 240,000 works of American, European, and Asian art. The museum's grand steps were immortalized in the movie 'Rocky' and offer sweeping views down the Benjamin Franklin Parkway.",
+          "distanceFromCampus": "3 miles"
+        },
+        {
+          "name": "Reading Terminal Market",
+          "type": "Food Market",
+          "description": "One of America's largest and oldest public markets (since 1893), featuring over 80 vendors selling fresh produce, Amish specialties, Philadelphia cheesesteaks, international cuisine, and artisan goods under one historic roof.",
+          "distanceFromCampus": "2.5 miles"
+        },
+        {
+          "name": "Schuylkill River Trail",
+          "type": "Outdoor Recreation",
+          "description": "A scenic multi-use trail running along the Schuylkill River near campus, offering 120 miles of paths for running, cycling, and walking, with river views, public art installations, and connections to Fairmount Park.",
+          "distanceFromCampus": "0.3 miles"
+        },
+        {
+          "name": "Barnes Foundation",
+          "type": "Art Museum",
+          "description": "Home to one of the world's greatest collections of French Impressionist and Post-Impressionist paintings, with an extraordinary concentration of Renoir, Cezanne, Matisse, and Picasso in an innovative gallery design.",
+          "distanceFromCampus": "3 miles"
+        },
+        {
+          "name": "Cira Green (Park in the Sky)",
+          "type": "Rooftop Park",
+          "description": "A spectacular 31,000-square-foot elevated park 12 stories above street level, offering panoramic views of the Philadelphia skyline, seasonal beer gardens, movie screenings, and one of the city's most unique outdoor experiences.",
+          "distanceFromCampus": "0.5 miles"
+        }
+      ]
+    }
+  ]
+}

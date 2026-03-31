@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Places — Ocean Blue | Top US Universities</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #020c1e;
+      --surface: #061a35;
+      --surface-hover: #0c2548;
+      --border: #0f2e58;
+      --border-hover: #1a4a80;
+      --text: #ddeeff;
+      --text-muted: #5f96c8;
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14,165,233,0.15);
+      --gradient-1: #0ea5e9;
+      --gradient-2: #0284c7;
+      --gradient-3: #38bdf8;
+      --star: #fbbf24;
+      --green: #34d399;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 20% 60%, rgba(14,165,233,0.15) 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 40%, rgba(56,189,248,0.1) 0%, transparent 55%);
+      animation: pulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1.1) rotate(3deg); }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--text) 0%, var(--gradient-3) 50%, var(--text) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 200% center; }
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem; left: 50%;
+      transform: translateX(-50%);
+      width: 24px; height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .scroll-indicator::after {
+      content: '';
+      width: 4px; height: 8px;
+      background: var(--accent);
+      border-radius: 4px;
+      margin-top: 6px;
+      animation: scroll-bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-bounce {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(12px); opacity: 0.3; }
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-inner::-webkit-scrollbar { display: none; }
+
+    .nav-link {
+      padding: 1rem 1.25rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
+    /* University Sections */
+    .university-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .uni-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.75rem; }
+
+    .uni-rank {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .uni-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .uni-location {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .uni-description {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 700px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* Places Grid */
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .place-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .place-card:hover {
+      border-color: rgba(14, 165, 233, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .place-img-container {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .place-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .place-card:hover .place-img { transform: scale(1.05); }
+
+    .place-img-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, rgba(10, 10, 15, 0.8));
+    }
+
+    .click-hint {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .place-card:hover .click-hint { opacity: 1; }
+
+    .place-body { padding: 1.25rem; }
+
+    .place-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .place-type {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background: var(--accent-glow);
+      color: var(--gradient-3);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .place-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--star);
+    }
+
+    .place-rating svg { width: 14px; height: 14px; fill: var(--star); }
+
+    .place-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    .place-description {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .place-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .place-distance, .place-cost-badge, .place-duration-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .place-cost-badge { color: var(--green); }
+
+    .place-distance svg, .place-duration-badge svg { width: 13px; height: 13px; opacity: 0.6; }
+
+    /* ====== MODAL ====== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      margin: 2rem auto;
+      overflow: hidden;
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-hero {
+      width: 100%;
+      height: 360px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .modal-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-hero-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 160px;
+      background: linear-gradient(transparent, var(--bg));
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 40px; height: 40px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      z-index: 2;
+    }
+
+    .modal-close:hover { background: rgba(0,0,0,0.8); }
+
+    .modal-nav {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      z-index: 2;
+    }
+
+    .modal-nav:hover { background: rgba(0,0,0,0.7); }
+    .modal-nav.prev { left: 16px; }
+    .modal-nav.next { right: 16px; }
+    .modal-nav:disabled { opacity: 0.3; cursor: default; }
+
+    .modal-body { padding: 0 2rem 2rem; }
+
+    .modal-header { margin-bottom: 1.5rem; margin-top: -2rem; position: relative; z-index: 1; }
+
+    .modal-uni-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gradient-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-place-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .modal-badge svg { width: 14px; height: 14px; opacity: 0.6; }
+    .modal-badge.rating { color: var(--star); }
+    .modal-badge.rating svg { fill: var(--star); opacity: 1; }
+    .modal-badge.cost { color: var(--green); }
+
+    .modal-section { margin-bottom: 1.75rem; }
+
+    .modal-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-description {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    .modal-review {
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .modal-review p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .modal-review .reviewer {
+      font-size: 0.78rem;
+      color: var(--gradient-3);
+      font-style: normal;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .tips-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .tip-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .tip-icon {
+      width: 28px; height: 28px;
+      min-width: 28px;
+      background: var(--accent-glow);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gradient-3);
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .tip-text {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .dont-miss {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .dont-miss-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .dont-miss-text {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .dont-miss-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gradient-3);
+      margin-bottom: 0.25rem;
+    }
+
+    .modal-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .info-card-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .info-card-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .uni-header { flex-direction: column; gap: 0.25rem; }
+      .uni-rank { font-size: 2.5rem; }
+      .places-grid { grid-template-columns: 1fr; }
+      .university-section { padding: 3rem 1.25rem; }
+      .modal-overlay { padding: 0.5rem; }
+      .modal-hero { height: 240px; }
+      .modal-place-name { font-size: 1.5rem; }
+      .modal-body { padding: 0 1.25rem 1.5rem; }
+      .modal-info-grid { grid-template-columns: 1fr; }
+      .modal-meta-row { gap: 0.5rem; }
+    }
+
+    /* ---- Filter Bar ---- */
+    .filter-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .filter-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-search-wrap {
+      position: relative;
+      flex: 0 0 200px;
+    }
+
+    .filter-search-wrap svg {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      width: 14px; height: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-search {
+      width: 100%;
+      padding: 0.45rem 0.75rem 0.45rem 2rem;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .filter-search:focus { border-color: var(--accent); }
+    .filter-search::placeholder { color: var(--text-muted); }
+
+    .filter-pills {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .fpill {
+      padding: 0.35rem 0.75rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .fpill:hover { border-color: var(--accent); color: var(--text); }
+    .fpill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .filter-divider {
+      width: 1px; height: 20px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .filter-cost-pills { display: flex; gap: 0.25rem; }
+
+    .cpill {
+      padding: 0.3rem 0.6rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cpill:hover { border-color: var(--green); color: var(--green); }
+    .cpill.active { background: rgba(34,197,94,0.12); border-color: var(--green); color: var(--green); }
+
+    .map-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.9rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: auto;
+    }
+
+    .map-toggle-btn:hover, .map-toggle-btn.active {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--gradient-3);
+    }
+
+    .filter-status {
+      max-width: 1200px;
+      margin: 0.4rem auto 0;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-height: 1rem;
+    }
+
+    /* ---- Map Panel ---- */
+    .map-panel {
+      height: 0;
+      overflow: hidden;
+      transition: height 0.35s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    .map-panel.visible {
+      height: 560px;
+      border-bottom-color: var(--border);
+    }
+
+    #map { width: 100%; height: 100%; background: var(--surface); }
+
+    /* Leaflet dark theme overrides */
+    .leaflet-popup-content-wrapper {
+      background: #1e1e2e;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .leaflet-popup-tip { background: #1e1e2e; }
+
+    .leaflet-popup-content {
+      margin: 10px 14px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .map-popup-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .map-popup-uni {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .map-popup-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.7rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .map-popup-btn:hover { background: var(--gradient-2); }
+
+    /* Hidden filter state */
+    .place-card.filter-hidden { display: none; }
+    .university-section.filter-hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">2026 Edition</div>
+      <h1>Discover the Best Places Near America's Top Universities</h1>
+      <p>A curated guide to the must-visit attractions, landmarks, and hidden gems near the top 10 nationally ranked universities in the United States.</p>
+      <a href="#universities" class="hero-cta">
+        Explore Universities
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M7 7h10v10"/></svg>
+      </a>
+    </div>
+    <div class="scroll-indicator"></div>
+  </section>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <div class="filter-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="filterSearch" class="filter-search" type="text" placeholder="Search places…" oninput="applyFilter()">
+      </div>
+      <div class="filter-pills" id="catPills">
+        <button class="fpill active" onclick="setCat(this,'all')">All</button>
+        <button class="fpill" onclick="setCat(this,'museum')">Museums</button>
+        <button class="fpill" onclick="setCat(this,'nature')">Nature</button>
+        <button class="fpill" onclick="setCat(this,'historic')">Historic</button>
+        <button class="fpill" onclick="setCat(this,'food')">Food</button>
+        <button class="fpill" onclick="setCat(this,'arts')">Arts</button>
+        <button class="fpill" onclick="setCat(this,'sports')">Sports</button>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-cost-pills" id="costPills">
+        <button class="cpill active" onclick="setCost(this,'all')">Any</button>
+        <button class="cpill" onclick="setCost(this,'Free')">Free</button>
+        <button class="cpill" onclick="setCost(this,'$')">$</button>
+        <button class="cpill" onclick="setCost(this,'$$')">$$</button>
+        <button class="cpill" onclick="setCost(this,'$$$')">$$$</button>
+      </div>
+      <button class="map-toggle-btn" id="mapToggleBtn" onclick="toggleMap()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        Map
+      </button>
+    </div>
+    <div class="filter-status" id="filterStatus"></div>
+  </div>
+
+  <!-- Map Panel -->
+  <div class="map-panel" id="mapPanel">
+    <div id="map"></div>
+  </div>
+
+  <nav class="nav" id="universities">
+    <div class="nav-inner" id="nav-links"></div>
+  </nav>
+
+  <main id="main"></main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal"></div>
+  </div>
+
+  <footer class="footer">
+    <p>Rankings based on U.S. News & World Report 2026 Best National Universities</p>
+    <p style="margin-top:0.5rem;opacity:0.6;">Images via Wikimedia Commons. Click any place for details & expert tips.</p>
+  </footer>
+
+  <script>
+    // DATA will be replaced with expert tips once ready
+    const DATA = {"universities":[
+      {"rank":1,"name":"Princeton University","location":{"city":"Princeton","state":"New Jersey"},"description":"Founded in 1746, Princeton is one of America's oldest and most prestigious universities, renowned for its commitment to undergraduate teaching, world-class research, and its stunning Gothic campus set in a charming New Jersey college town.","placesToVisit":[
+        {"name":"Princeton University Art Museum","type":"Museum","description":"Founded in 1882 with over 117,000 works spanning antiquity to contemporary art. Reopened in 2025 in a stunning new building designed by Sir David Adjaye. Free admission.","distanceFromCampus":"On campus","image":"princeton-art-museum.jpg","rating":4.7,"review":"A refreshing and astonishing new take on museum curation. The building, exhibits, store, and restaurant are all stunning — and it's all free.","reviewer":"TripAdvisor Visitor"},
+        {"name":"Palmer Square","type":"Shopping & Dining District","description":"Princeton's charming village-within-a-village features an array of boutiques, restaurants, and cafes tucked into Tudor-style buildings around a grassy green and the historic Nassau Inn.","distanceFromCampus":"0.2 miles","image":"palmer-square.jpg","rating":4.5,"review":"A charming and festive destination, especially during the holidays. Always packed with people visiting from all parts of the world.","reviewer":"Yelp Reviewer"},
+        {"name":"Princeton Battlefield State Park","type":"Historic Site & Park","description":"The site of the pivotal January 1777 Battle of Princeton during the American Revolutionary War, where George Washington's forces defeated the British.","distanceFromCampus":"1.5 miles","image":"princeton-battlefield.jpg","rating":4.6,"review":"A serene park with real historical significance. Walk the same ground where Washington turned the tide of the Revolution.","reviewer":"Google Reviewer"},
+        {"name":"Morven Museum & Garden","type":"Historic House Museum","description":"A National Historic Landmark on 5 pristine acres, this was the home of Richard Stockton, a signer of the Declaration of Independence, and a former NJ Governor's Mansion.","distanceFromCampus":"0.5 miles","image":"morven-museum.jpg","rating":4.5,"review":"Beautiful grounds and fascinating history. The gardens alone are worth the visit, especially in spring.","reviewer":"Sarah M."},
+        {"name":"McCarter Theatre Center","type":"Performing Arts Venue","description":"Princeton's Tony Award-winning regional theater presents world-class drama, dance, music, and comedy performances year-round.","distanceFromCampus":"0.3 miles","image":"mccarter-theatre.jpg","rating":4.7,"review":"Consistently outstanding productions. One of the best regional theaters in the country — intimate setting with big talent.","reviewer":"James R."},
+        {"name":"D&R Canal State Park","type":"Nature & Recreation","description":"Over 70 miles of multi-use trails along a historic 19th-century canal offer scenic walking, biking, jogging, and kayaking through beautiful NJ countryside.","distanceFromCampus":"1 mile","image":"dr-canal-state-park.jpg","rating":4.6,"review":"Perfect for a peaceful walk or bike ride. The towpath trail is flat and shaded — great for all ages and fitness levels.","reviewer":"Mike T."},
+        {"name":"Nassau Street","type":"Historic Main Street","description":"The main thoroughfare through Princeton's downtown, lined with independent bookstores, acclaimed restaurants, and artisan ice cream shops including The Bent Spoon.","distanceFromCampus":"0.1 miles","image":"nassau-street.jpg","rating":4.5,"review":"The heartbeat of Princeton. Great mix of restaurants, shops, and the best ice cream at The Bent Spoon.","reviewer":"Local Guide"}
+      ]},
+      {"rank":2,"name":"Massachusetts Institute of Technology (MIT)","location":{"city":"Cambridge","state":"Massachusetts"},"description":"Founded in 1861, MIT is the world's leading institution for science, technology, engineering, and mathematics, known for its cutting-edge research, innovative spirit, and an iconic campus along the Charles River.","placesToVisit":[
+        {"name":"MIT Museum","type":"Museum","description":"Reopened in a stunning new Kendall Square location in 2022, this hands-on museum showcases MIT's groundbreaking innovations in robotics, holography, AI, and the intersection of art and science.","distanceFromCampus":"On campus","image":"mit-museum.jpg","rating":4.5,"review":"Outstanding collection, beautifully architected space, so much history but also interaction with the science and technology of the present.","reviewer":"Yelp Reviewer"},
+        {"name":"Charles River Esplanade","type":"Waterfront Park","description":"A scenic reservation along the Charles River with jogging and cycling paths, sailing opportunities, and the Hatch Memorial Shell for outdoor concerts.","distanceFromCampus":"0.3 miles","image":"charles-river-esplanade.jpg","rating":4.7,"review":"One of the most beautiful urban parks in America. The sunset views of the Boston skyline from here are absolutely magical.","reviewer":"David K."},
+        {"name":"Kendall Square","type":"Innovation District","description":"Known as 'the most innovative square mile on the planet,' this vibrant neighborhood is home to hundreds of biotech and tech companies, trendy restaurants, and startup culture.","distanceFromCampus":"0.2 miles","image":"kendall-square.jpg","rating":4.4,"review":"You can feel the energy of innovation just walking around. Great restaurants and the vibe of being at the center of tech.","reviewer":"Google Reviewer"},
+        {"name":"Harvard Square","type":"Historic Shopping & Cultural District","description":"Visited by over 8 million people annually, packed with independent bookstores, eclectic restaurants, street performers, and Harvard University just a short walk away.","distanceFromCampus":"1.5 miles","image":"harvard-square.jpg","rating":4.6,"review":"A must-visit. The bookstores, street performers, and cafe culture make it one of the most vibrant squares in America.","reviewer":"Emily W."},
+        {"name":"Museum of Science","type":"Museum","description":"One of Boston's premier attractions with hundreds of interactive exhibits spanning astronomy, technology, natural history, and human biology, plus a planetarium and IMAX theater.","distanceFromCampus":"1 mile","image":"museum-of-science.jpg","rating":4.6,"review":"Fantastic for all ages. The planetarium show alone is worth the trip. Plan for at least 3-4 hours — there's so much to explore.","reviewer":"TripAdvisor Visitor"},
+        {"name":"Freedom Trail","type":"Historic Walking Tour","description":"A 2.5-mile red-brick walking trail through 16 of Boston's most significant historic sites, including Paul Revere's House and Faneuil Hall.","distanceFromCampus":"2 miles","image":"freedom-trail.jpg","rating":4.7,"review":"Walking through American history. The trail is well-marked and the sites are incredible. A must-do in Boston.","reviewer":"Rachel P."},
+        {"name":"Fenway Park","type":"Sports Landmark","description":"Home to the Boston Red Sox since 1912, Fenway is America's oldest Major League Baseball park, famous for its iconic 37-foot 'Green Monster' left-field wall.","distanceFromCampus":"3 miles","image":"fenway-park.jpg","rating":4.7,"review":"Even if you're not a baseball fan, Fenway Park is an experience. The history, the atmosphere, the Green Monster — nothing like it.","reviewer":"Chris B."}
+      ]},
+      {"rank":3,"name":"Harvard University","location":{"city":"Cambridge","state":"Massachusetts"},"description":"Founded in 1636, Harvard is the oldest institution of higher education in the United States and among the most prestigious in the world, with an unparalleled endowment and an alumni network that includes eight U.S. presidents.","placesToVisit":[
+        {"name":"Harvard Yard & John Harvard Statue","type":"Historic Campus Landmark","description":"The heart of Harvard's campus features buildings dating to 1720. The iconic John Harvard statue is one of the most photographed landmarks in Boston — tradition says rubbing his foot brings good luck.","distanceFromCampus":"On campus","image":"harvard-yard.jpg","rating":4.7,"review":"The statue of three lies is a must-see. Rubbing the foot is a fun tradition. The campus architecture is breathtaking.","reviewer":"TripAdvisor Visitor"},
+        {"name":"Harvard Art Museums","type":"Art Museum","description":"Three world-class museums — the Fogg, Busch-Reisinger, and Arthur M. Sackler — united under a stunning Renzo Piano glass roof, housing masterworks from antiquity to present.","distanceFromCampus":"On campus","image":"harvard-art-museums.jpg","rating":4.7,"review":"The Renzo Piano renovation is gorgeous. World-class art in an intimate setting. Don't miss the courtyard on the top floor.","reviewer":"Art Enthusiast"},
+        {"name":"Harvard Museum of Natural History","type":"Natural History Museum","description":"Home to dinosaur skeletons, a whale skeleton, and the world-famous Blaschka Glass Flowers — over 4,000 exquisitely realistic glass botanical models.","distanceFromCampus":"0.3 miles","image":"harvard-natural-history.jpg","rating":4.6,"review":"The Glass Flowers collection is unlike anything I've ever seen. You cannot believe they're made of glass. Absolutely extraordinary.","reviewer":"Laura M."},
+        {"name":"Mount Auburn Cemetery","type":"Historic Landmark & Nature","description":"America's first landscaped cemetery (1831) and a National Historic Landmark, featuring 175 acres of gorgeous gardens, 5,000+ trees, and the resting places of Longfellow and Winslow Homer.","distanceFromCampus":"1 mile","image":"mount-auburn-cemetery.jpg","rating":4.8,"review":"More beautiful garden than cemetery. Climb Washington Tower for the best panoramic views of Cambridge and Boston.","reviewer":"Nature Lover"},
+        {"name":"Harvard Square","type":"Shopping & Cultural District","description":"An iconic urban square featuring independent bookstores, sidewalk cafes, street musicians, and shops from quirky vintage stores to the legendary Harvard Coop.","distanceFromCampus":"Adjacent","image":"harvard-square-district.jpg","rating":4.6,"review":"A cultural crossroads alive with energy day and night. The bookstores and cafes are unbeatable.","reviewer":"Google Reviewer"},
+        {"name":"Peabody Museum of Archaeology and Ethnology","type":"Museum","description":"Founded in 1866, one of the oldest anthropology museums in the world, housing over 1 million artifacts including the largest surviving Lewis and Clark collection.","distanceFromCampus":"0.3 miles","image":"peabody-museum.jpg","rating":4.5,"review":"A hidden gem within Harvard. The Lewis and Clark collection and Native American exhibits are world-class and deeply moving.","reviewer":"History Buff"},
+        {"name":"Charles River Bike Path","type":"Outdoor Recreation","description":"Miles of scenic paths along both banks of the Charles River, perfect for running, cycling, and rowing, with beautiful views of the Boston and Cambridge skylines.","distanceFromCampus":"0.5 miles","image":"charles-river-bike-path.jpg","rating":4.7,"review":"The best way to see Cambridge and Boston. Rent a bike and ride along the river — the views are stunning at every turn.","reviewer":"Runner's World"}
+      ]},
+      {"rank":4,"name":"Stanford University","location":{"city":"Stanford (Palo Alto)","state":"California"},"description":"Founded in 1885 in the heart of Silicon Valley, Stanford is a world leader in entrepreneurship, technology, and research, boasting a sprawling 8,180-acre campus with iconic sandstone buildings and palm-lined boulevards.","placesToVisit":[
+        {"name":"Cantor Arts Center & Rodin Sculpture Garden","type":"Art Museum & Sculpture Garden","description":"A 130,000-sq-ft museum housing over 38,000 works including the largest collection of Auguste Rodin bronzes outside Paris. Free to the public.","distanceFromCampus":"On campus","image":"cantor-arts-center.jpg","rating":4.7,"review":"Loved the entire art museum and the Rodin exhibit was over the top. No fee required — Stanford is so fortunate to have this treasure!","reviewer":"TripAdvisor Visitor"},
+        {"name":"Hoover Tower","type":"Campus Landmark & Observation Deck","description":"The 285-foot iconic tower houses the Hoover Institution Library and Archives. Visitors can ascend to the observation deck for a breathtaking 360-degree panoramic view of the Bay Area.","distanceFromCampus":"On campus","image":"hoover-tower.jpg","rating":4.6,"review":"The view from the top is absolutely incredible on a clear day. You can see all the way to San Francisco. Worth every step.","reviewer":"Bay Area Local"},
+        {"name":"The Stanford Dish Trail","type":"Hiking Trail","description":"A beloved 3.5-mile paved loop trail through the golden foothills behind campus, offering sweeping views of the Bay Area and passing a retired radio telescope dish.","distanceFromCampus":"1 mile","image":"stanford-dish-trail.jpg","rating":4.8,"review":"My favorite hike in the Bay Area. The golden hills, the views, the dish itself — it's quintessential California.","reviewer":"AllTrails Reviewer"},
+        {"name":"Stanford Memorial Church","type":"Historic Landmark","description":"A stunning non-denominational church featuring breathtaking Venetian mosaics, stained glass windows, and Romanesque-Byzantine architecture.","distanceFromCampus":"On campus","image":"stanford-memorial-church.jpg","rating":4.8,"review":"The facade is an artistic masterpiece. The interior is just as spectacular — this church rivals most I've seen throughout Europe.","reviewer":"Yelp Reviewer"},
+        {"name":"Computer History Museum","type":"Technology Museum","description":"Located in nearby Mountain View, this fascinating museum traces the history of computing from the abacus to AI, with interactive exhibits including a working Babbage Engine.","distanceFromCampus":"5 miles","image":"computer-history-museum.jpg","rating":4.7,"review":"A paradise for tech enthusiasts. The evolution of computing displayed here is mind-blowing. Plan for at least 2-3 hours.","reviewer":"Tech Reviewer"},
+        {"name":"Palo Alto Baylands Nature Preserve","type":"Nature Preserve","description":"The largest tract of undisturbed marshland in the San Francisco Bay, with 15 miles of trails across 1,940 acres. Spectacular for birdwatching and sunset views.","distanceFromCampus":"3 miles","image":"baylands-nature-preserve.jpg","rating":4.6,"review":"The best sunset spot in the Bay Area. Bring binoculars for the incredible birdlife. Peaceful and beautiful year-round.","reviewer":"Nature Photographer"},
+        {"name":"University Avenue (Downtown Palo Alto)","type":"Shopping & Dining District","description":"The vibrant main street connecting campus to downtown Palo Alto, lined with acclaimed restaurants, boutiques, sidewalk cafes, and tech startup offices.","distanceFromCampus":"0.5 miles","image":"university-avenue-palo-alto.jpg","rating":4.4,"review":"Great dining scene with everything from casual bites to fine dining. The energy of Silicon Valley is everywhere you look.","reviewer":"Food Critic"}
+      ]},
+      {"rank":4,"name":"Yale University","location":{"city":"New Haven","state":"Connecticut"},"description":"Founded in 1701, Yale is one of America's most storied Ivy League universities, celebrated for its exceptional arts and humanities programs, stunning collegiate Gothic architecture, and vibrant campus.","placesToVisit":[
+        {"name":"Yale University Art Gallery","type":"Art Museum","description":"The oldest university art museum in the United States, with over 300,000 works spanning ancient Egypt to the present, including masterpieces by van Gogh, Picasso, and Hopper. Free admission.","distanceFromCampus":"On campus","image":"yale-art-gallery.jpg","rating":4.8,"review":"An absolutely world-class collection in a landmark Louis Kahn building. The fact that it's free makes it even more special.","reviewer":"Art Lover"},
+        {"name":"Beinecke Rare Book & Manuscript Library","type":"Library & Architectural Landmark","description":"An architectural icon by Gordon Bunshaft, with translucent marble panels that glow with natural light. Houses a Gutenberg Bible and one of the world's largest rare book collections.","distanceFromCampus":"On campus","image":"beinecke-library.jpg","rating":4.8,"review":"The way the marble walls glow with sunlight is otherworldly. Seeing a real Gutenberg Bible up close is a once-in-a-lifetime experience.","reviewer":"Book Lover"},
+        {"name":"Yale Peabody Museum of Natural History","type":"Natural History Museum","description":"Recently renovated, features a 67-foot Brontosaurus skeleton, dazzling mineral collections, and hands-on exhibits spanning dinosaurs and ancient civilizations.","distanceFromCampus":"0.3 miles","image":"yale-peabody-museum.jpg","rating":4.6,"review":"The renovation is fantastic. Kids and adults alike will be amazed by the dinosaur hall. A real gem in New Haven.","reviewer":"Family Visitor"},
+        {"name":"New Haven Green","type":"Historic Park","description":"A 16-acre National Historic Landmark and one of New England's oldest town greens, flanked by three historic churches and hosting festivals year-round.","distanceFromCampus":"Adjacent","image":"new-haven-green.jpg","rating":4.4,"review":"A beautiful and historic gathering place. The three churches are architectural marvels. Great for a leisurely stroll.","reviewer":"Local Guide"},
+        {"name":"Wooster Street (New Haven Apizza)","type":"Restaurant District","description":"The legendary home of New Haven-style apizza. Frank Pepe Pizzeria Napoletana (since 1925) and Sally's Apizza are pilgrimage-worthy destinations for pizza lovers worldwide.","distanceFromCampus":"1 mile","image":"wooster-street.jpg","rating":4.7,"review":"The best pizza in America, period. Frank Pepe's clam pie is legendary for a reason. Be prepared to wait — it's worth every minute.","reviewer":"Pizza Pilgrim"},
+        {"name":"Yale Center for British Art","type":"Art Museum","description":"The largest collection of British art outside the United Kingdom, housed in the last building designed by architect Louis Kahn. Works by Turner, Constable, and Gainsborough. Free.","distanceFromCampus":"On campus","image":"yale-british-art.jpg","rating":4.7,"review":"A beautifully curated museum in a stunning Kahn building. The natural light flooding through is perfection. An underrated masterpiece.","reviewer":"Architecture Fan"},
+        {"name":"East Rock Park","type":"Nature & Scenic Viewpoint","description":"A dramatic 365-foot basalt ridge offering hiking trails and one of the best panoramic views in Connecticut — overlooking New Haven, Long Island Sound, and the Yale campus.","distanceFromCampus":"2 miles","image":"east-rock-park.jpg","rating":4.7,"review":"The summit view is absolutely breathtaking. You can see all of New Haven, the Sound, and on clear days, Long Island. Don't miss sunset.","reviewer":"Hiker"}
+      ]},
+      {"rank":6,"name":"University of Chicago","location":{"city":"Chicago","state":"Illinois"},"description":"Founded in 1890 with funding from John D. Rockefeller, UChicago is renowned for its rigorous intellectual culture, groundbreaking research, and stunning Gothic campus in the historic Hyde Park neighborhood.","placesToVisit":[
+        {"name":"Frank Lloyd Wright's Robie House","type":"Architectural Landmark","description":"A masterpiece of Prairie School architecture designed by Frank Lloyd Wright in 1910. A UNESCO World Heritage Site located steps from campus.","distanceFromCampus":"Adjacent","image":"robie-house.jpg","rating":4.6,"review":"A pilgrimage site for architecture lovers. The cantilevered roofs and art glass windows are even more impressive in person.","reviewer":"Architecture Buff"},
+        {"name":"Griffin Museum of Science and Industry","type":"Science Museum","description":"The largest science museum in the Western Hemisphere, housed in a stunning 1893 World's Fair building, with over 2,000 exhibits including a German U-505 submarine.","distanceFromCampus":"0.5 miles","image":"museum-science-industry.jpg","rating":4.7,"review":"Plan for a full day. The U-505 submarine exhibit is incredible. The coal mine replica feels startlingly real. A Chicago must-visit.","reviewer":"Family Visitor"},
+        {"name":"Promontory Point","type":"Lakefront Park & Scenic Viewpoint","description":"A man-made peninsula jutting into Lake Michigan, offering some of the most breathtaking views of the Chicago skyline. Beloved for picnics and sunset watching.","distanceFromCampus":"0.7 miles","image":"promontory-point.jpg","rating":4.8,"review":"The best skyline view in Chicago, hands down. Come at sunset with a picnic and you'll never want to leave.","reviewer":"Chicago Local"},
+        {"name":"Seminary Co-op Bookstore","type":"Independent Bookstore","description":"World-famous academic bookstore with over 100,000 titles, widely regarded as one of the best bookstores in America. A haven for scholars and bibliophiles.","distanceFromCampus":"On campus","image":"seminary-coop.jpg","rating":4.7,"review":"If you love books, this is your temple. The curation is unmatched — you'll find things here you won't find anywhere else.","reviewer":"Bibliophile"},
+        {"name":"Rockefeller Memorial Chapel","type":"Historic Chapel & Concert Venue","description":"The tallest building on campus, this magnificent Gothic chapel features stunning stained glass windows and hosts renowned organ and carillon concerts.","distanceFromCampus":"On campus","image":"rockefeller-chapel.jpg","rating":4.7,"review":"The carillon concerts are magical. The interior is awe-inspiring — the stained glass rivals European cathedrals.","reviewer":"Music Lover"},
+        {"name":"Osaka Garden in Jackson Park","type":"Japanese Garden","description":"A serene Japanese garden on a secluded island, featuring a traditional moon bridge, tranquil lagoons — originally created for the 1893 World's Columbian Exposition.","distanceFromCampus":"0.8 miles","image":"osaka-garden.jpg","rating":4.5,"review":"A peaceful hidden oasis in the middle of Chicago. The moon bridge and koi ponds are absolutely beautiful and calming.","reviewer":"Zen Seeker"},
+        {"name":"Court Theatre","type":"Professional Theater","description":"Named 'the most consistently excellent theater company in America' by the Wall Street Journal. Tony Award-winning theater presenting bold interpretations of classic works.","distanceFromCampus":"On campus","image":"court-theatre.jpg","rating":4.6,"review":"Every production is thoughtful and beautifully executed. Intimate venue with consistently excellent acting and direction.","reviewer":"Theater Critic"}
+      ]},
+      {"rank":7,"name":"Duke University","location":{"city":"Durham","state":"North Carolina"},"description":"Founded in 1838, Duke is a top-tier research university set on a beautiful 8,610-acre campus known for its neo-Gothic architecture, powerhouse athletics, and the renowned Duke University Health System.","placesToVisit":[
+        {"name":"Sarah P. Duke Gardens","type":"Botanical Garden","description":"Recognized among the top 10 public gardens in the U.S., these 55 acres feature terraced gardens, a Japanese-inspired Asiatic Arboretum, and five miles of walking paths.","distanceFromCampus":"On campus","image":"duke-gardens.jpg","rating":4.8,"review":"One of the most beautiful gardens I've ever visited. Every season offers something different. The terraced gardens are magical.","reviewer":"Garden Enthusiast"},
+        {"name":"Duke University Chapel","type":"Historic Chapel & Landmark","description":"A breathtaking neo-Gothic chapel with a soaring 210-foot tower, 77 stained glass windows, and a 5,000-pipe Flentrop organ. Built in the 1930s.","distanceFromCampus":"On campus","image":"duke-chapel.jpg","rating":4.9,"review":"Absolutely stunning. The stained glass windows and the organ are world-class. One of the most beautiful chapels in America.","reviewer":"TripAdvisor Visitor"},
+        {"name":"Duke Lemur Center","type":"Wildlife Sanctuary","description":"Home to over 200 lemurs across 14 species — the world's largest collection outside Madagascar. Guided tours offer rare close encounters with these endangered primates.","distanceFromCampus":"2 miles","image":"duke-lemur-center.jpg","rating":4.8,"review":"A once-in-a-lifetime experience. Getting up close with the lemurs is pure joy. Book your tour well in advance!","reviewer":"Animal Lover"},
+        {"name":"Nasher Museum of Art","type":"Art Museum","description":"A striking modern building by Rafael Vinoly housing over 10,000 works, with strengths in pre-Columbian, medieval, and contemporary art. Free admission.","distanceFromCampus":"On campus","image":"nasher-museum.jpg","rating":4.5,"review":"A beautiful building with a thoughtfully curated collection. The contemporary exhibits are always thought-provoking.","reviewer":"Art Visitor"},
+        {"name":"American Tobacco Campus","type":"Historic District","description":"A beautifully restored tobacco warehouse district that is now Durham's vibrant hub for dining, live entertainment, and cultural events.","distanceFromCampus":"2 miles","image":"american-tobacco-campus.jpg","rating":4.5,"review":"Great adaptive reuse of historic buildings. Wonderful restaurants, live music, and the perfect place to spend an evening in Durham.","reviewer":"Durham Local"},
+        {"name":"Durham Bulls Athletic Park","type":"Sports Venue","description":"Home to the Durham Bulls (Triple-A baseball), made famous by the movie 'Bull Durham.' Features a towering mechanical bull.","distanceFromCampus":"3 miles","image":"durham-bulls.jpg","rating":4.7,"review":"Minor league baseball at its finest. Affordable, fun, great food, and the mechanical bull is iconic. A quintessential Durham experience.","reviewer":"Sports Fan"},
+        {"name":"Eno River State Park","type":"State Park & Nature","description":"A tranquil natural escape offering hiking trails along the scenic Eno River, swimming holes, picnic areas, and paddling opportunities.","distanceFromCampus":"10 miles","image":"eno-river.jpg","rating":4.6,"review":"A beautiful escape from the city. The river trails are peaceful and perfect for a morning hike or afternoon swim.","reviewer":"Nature Hiker"}
+      ]},
+      {"rank":7,"name":"Johns Hopkins University","location":{"city":"Baltimore","state":"Maryland"},"description":"Founded in 1876 as America's first research university, Johns Hopkins pioneered graduate education in the US and remains a global leader in medicine, public health, and scientific research.","placesToVisit":[
+        {"name":"Baltimore Museum of Art","type":"Art Museum","description":"Houses over 97,000 works including the renowned Cone Collection of Matisse and Picasso, plus beautiful outdoor sculpture gardens. Free admission.","distanceFromCampus":"Adjacent","image":"baltimore-museum-art.jpg","rating":4.6,"review":"The Cone Collection alone makes this museum world-class. And it's completely free! The sculpture gardens are a lovely bonus.","reviewer":"Art Appreciator"},
+        {"name":"George Peabody Library","type":"Historic Library","description":"Often called the 'Cathedral of Books,' this jaw-droppingly beautiful library features a soaring 61-foot atrium with ornate cast-iron balconies, housing 300,000 volumes.","distanceFromCampus":"3 miles","image":"peabody-library.jpg","rating":4.8,"review":"The most beautiful library I have ever seen. The atrium will take your breath away. One of Baltimore's greatest treasures.","reviewer":"Book Lover"},
+        {"name":"National Aquarium","type":"Aquarium","description":"Standing seven stories high at Baltimore's Inner Harbor, widely regarded as one of America's best aquariums, featuring over 20,000 animals and a rooftop rainforest.","distanceFromCampus":"4 miles","image":"national-aquarium.jpg","rating":4.5,"review":"A world-class aquarium. The rooftop rainforest is amazing and the jellyfish exhibit is mesmerizing. Allow at least 3 hours.","reviewer":"Family Visitor"},
+        {"name":"Fort McHenry National Monument","type":"Historic Site","description":"The birthplace of 'The Star-Spangled Banner,' where Francis Scott Key witnessed the British bombardment in 1814. Star-shaped fort with harbor views.","distanceFromCampus":"6 miles","image":"fort-mchenry.jpg","rating":4.7,"review":"Standing where Francis Scott Key stood and looking out at the harbor is incredibly moving. A must-visit for any American.","reviewer":"History Lover"},
+        {"name":"Oriole Park at Camden Yards","type":"Sports Landmark","description":"The ballpark that revolutionized modern stadium design, home to the Baltimore Orioles since 1992. Its retro-classic architecture set the standard for every MLB park since.","distanceFromCampus":"4 miles","image":"camden-yards.jpg","rating":4.7,"review":"The gold standard of baseball stadiums. Beautiful design, great sightlines, and the warehouse backdrop is iconic.","reviewer":"Baseball Fan"},
+        {"name":"American Visionary Art Museum","type":"Art Museum","description":"A one-of-a-kind museum dedicated to self-taught 'outsider art,' featuring wildly creative and unconventional works. Also hosts the annual Kinetic Sculpture Race.","distanceFromCampus":"5 miles","image":"visionary-art-museum.jpg","rating":4.7,"review":"Unlike any museum you've ever been to. The art is raw, emotional, and wildly creative. The Kinetic Sculpture Race is a must-see event.","reviewer":"AVAM Fan"},
+        {"name":"Fell's Point","type":"Historic Waterfront Neighborhood","description":"A charming cobblestoned waterfront neighborhood dating to 1726, packed with eclectic restaurants, pubs, boutiques, and the Broadway Market.","distanceFromCampus":"4 miles","image":"fells-point.jpg","rating":4.6,"review":"Baltimore's most atmospheric neighborhood. Cobblestone streets, waterfront dining, and some of the best bars in the city.","reviewer":"Baltimore Local"}
+      ]},
+      {"rank":7,"name":"Northwestern University","location":{"city":"Evanston","state":"Illinois"},"description":"Founded in 1851, Northwestern is uniquely situated on the shores of Lake Michigan just north of Chicago, renowned for its top-ranked programs in journalism, performing arts, engineering, and business.","placesToVisit":[
+        {"name":"Lake Michigan Shoreline & Campus Beaches","type":"Waterfront & Beaches","description":"Northwestern's campus sits directly on Lake Michigan, offering rare lakefront access with sandy beaches, sailing, kayaking, and paddleboarding.","distanceFromCampus":"On campus","image":"lake-michigan-shoreline.jpg","rating":4.7,"review":"Having a beach on a university campus is unreal. The sunsets over Lake Michigan are some of the most beautiful I've seen anywhere.","reviewer":"NU Student"},
+        {"name":"Block Museum of Art","type":"Art Museum","description":"A free museum featuring a 5,000-item permanent collection with works by Andy Warhol and Mary Cassatt, plus rotating exhibitions and an outdoor sculpture walk.","distanceFromCampus":"On campus","image":"block-museum.jpg","rating":4.4,"review":"A small but mighty museum. The rotating exhibitions are always thoughtful and the outdoor sculpture walk is a lovely surprise.","reviewer":"Art Visitor"},
+        {"name":"Grosse Point Lighthouse","type":"Historic Landmark","description":"An 1873 lighthouse on Evanston's Lake Michigan shoreline, designated a National Historic Landmark. Climb to the top for stunning lake views on summer weekends.","distanceFromCampus":"0.5 miles","image":"grosse-point-lighthouse.jpg","rating":4.6,"review":"A beautiful piece of history right on the lake. Climbing to the top for the panoramic views is absolutely worth it.","reviewer":"History Buff"},
+        {"name":"Downtown Evanston","type":"Shopping & Dining District","description":"A vibrant downtown just steps from campus, featuring diverse restaurants, craft breweries, art galleries, boutiques, and the lively Fountain Square.","distanceFromCampus":"0.5 miles","image":"downtown-evanston.jpg","rating":4.5,"review":"Great food scene — everything from ramen to French bistros. The farmers market on Saturday is fantastic.","reviewer":"Foodie"},
+        {"name":"Mitchell Museum of the American Indian","type":"Museum","description":"One of only a few museums in the country dedicated exclusively to Native American and First Nation peoples, featuring artifacts from across the U.S. and Canada.","distanceFromCampus":"1 mile","image":"mitchell-museum.jpg","rating":4.5,"review":"An important and beautifully presented museum. The exhibits are educational and deeply respectful. A hidden gem in Evanston.","reviewer":"Cultural Explorer"},
+        {"name":"Chicago (via CTA/Metra)","type":"World-Class City","description":"Just a 30-minute train ride south, downtown Chicago offers the Art Institute, Millennium Park, Navy Pier, deep-dish pizza, and an unrivaled cultural scene.","distanceFromCampus":"12 miles","image":"chicago-skyline.jpg","rating":4.8,"review":"Having world-class Chicago just a short train ride away is Northwestern's secret weapon. The Art Institute alone is worth the trip.","reviewer":"City Explorer"},
+        {"name":"Shakespeare Garden","type":"Garden & Campus Green Space","description":"A charming garden planted with flowers and herbs mentioned in Shakespeare's plays, offering a peaceful retreat with Lake Michigan views.","distanceFromCampus":"On campus","image":"shakespeare-garden.jpg","rating":4.5,"review":"A magical hidden spot on campus. Reading Shakespeare surrounded by the plants he wrote about, with Lake Michigan in the background — perfection.","reviewer":"Literature Lover"}
+      ]},
+      {"rank":7,"name":"University of Pennsylvania","location":{"city":"Philadelphia","state":"Pennsylvania"},"description":"Founded by Benjamin Franklin in 1740, Penn is one of the original Ivy League universities and a pioneer of interdisciplinary education, situated in Philadelphia's University City neighborhood.","placesToVisit":[
+        {"name":"Penn Museum","type":"Museum","description":"One of the world's great archaeology museums, housing over 1 million artifacts including a 3,000-year-old Egyptian Sphinx — the largest in the Western Hemisphere.","distanceFromCampus":"On campus","image":"penn-museum.jpg","rating":4.6,"review":"The Egyptian and Mesopotamian collections are astounding. The Sphinx alone is worth the visit. A world-class museum that deserves more attention.","reviewer":"History Enthusiast"},
+        {"name":"Independence Hall & Liberty Bell","type":"Historic Landmark","description":"The birthplace of American democracy where the Declaration of Independence and U.S. Constitution were signed. A UNESCO World Heritage Site.","distanceFromCampus":"2 miles","image":"independence-hall.jpg","rating":4.8,"review":"Standing in the room where the founding fathers debated our democracy is profoundly moving. Every American should visit at least once.","reviewer":"Patriot"},
+        {"name":"Philadelphia Museum of Art","type":"Art Museum","description":"One of America's largest art museums, with over 240,000 works. The grand steps were immortalized in 'Rocky' and offer sweeping views down the Benjamin Franklin Parkway.","distanceFromCampus":"3 miles","image":"philadelphia-museum-art.jpg","rating":4.7,"review":"Running up the Rocky steps is a must, but the art inside is the real treasure. The Impressionist collection is extraordinary.","reviewer":"Art Lover"},
+        {"name":"Reading Terminal Market","type":"Food Market","description":"One of America's largest and oldest public markets (since 1893), featuring over 80 vendors selling fresh produce, Amish specialties, cheesesteaks, and international cuisine.","distanceFromCampus":"2.5 miles","image":"reading-terminal-market.jpg","rating":4.6,"review":"A food lover's paradise. The Amish pretzels, DiNic's roast pork, and Beiler's donuts are all incredible. Come hungry!","reviewer":"Foodie"},
+        {"name":"Schuylkill River Trail","type":"Outdoor Recreation","description":"A scenic multi-use trail running along the Schuylkill River near campus, offering 120 miles of paths with river views and public art installations.","distanceFromCampus":"0.3 miles","image":"schuylkill-river-trail.jpg","rating":4.6,"review":"The best urban trail in Philadelphia. Perfect for running, biking, or just a peaceful walk along the river. Beautiful at sunset.","reviewer":"Runner"},
+        {"name":"Barnes Foundation","type":"Art Museum","description":"Home to one of the world's greatest collections of French Impressionist and Post-Impressionist paintings — extraordinary Renoir, Cezanne, Matisse, and Picasso.","distanceFromCampus":"3 miles","image":"barnes-foundation.jpg","rating":4.7,"review":"The density of masterpieces per square foot is unmatched. The way Barnes arranged the art is itself a work of genius. Truly unique.","reviewer":"TripAdvisor Visitor"},
+        {"name":"Cira Green (Park in the Sky)","type":"Rooftop Park","description":"A spectacular 31,000-sq-ft elevated park 12 stories above street level, offering panoramic views of the Philadelphia skyline, seasonal beer gardens, and movie screenings.","distanceFromCampus":"0.5 miles","image":"cira-green.jpg","rating":4.5,"review":"A rooftop park unlike anything else in Philly. The views are incredible, and the summer beer garden and movie nights are a blast.","reviewer":"Philly Local"}
+      ]}
+    ]};
+
+    const TIPS = {"princeton-art-museum": {"tips": ["The museum reopened in late 2025 with nearly double the exhibition space -- visit the new building's soaring atrium and rooftop terrace for unique architectural views of campus.", "Dine at Mosaic, the museum's in-house restaurant (open Thu-Mon), for a refined lunch without leaving the building.", "Weekday mornings before noon are the quietest times; the Thursday and Friday late hours (until 8pm) are perfect for a relaxed evening visit."], "bestTime": "Visit on a weekday morning in spring or fall for the smallest crowds and pleasant campus walks.", "duration": "1.5-2 hours", "cost": "Free", "hours": "Mon-Wed & Sat 10am-5pm, Thu-Fri 10am-8pm, Sun 12-5pm", "dontMiss": "The newly expanded galleries featuring over 117,000 works spanning 5,000 years, especially the Asian art and photography collections in the new wing."}, "palmer-square": {"tips": ["The square hosts seasonal events including a farmers market on Thursdays (spring through fall) -- arrive by 10am for the best selection of local produce and baked goods.", "Grab a table at one of the outdoor patios along the green for prime people-watching and a view of the historic Nassau Inn.", "Park in the Palmer Square garage (2 hours free with validation from select shops) to avoid the notoriously tight street parking."], "bestTime": "Late spring through early fall when outdoor dining and the farmers market are in full swing.", "duration": "1-2 hours", "cost": "Free", "hours": "Shops generally 10am-7pm, restaurants open later; outdoor areas 24/7", "dontMiss": "The Bent Spoon for artisanal ice cream made with local, seasonal ingredients -- often cited as the best ice cream in New Jersey."}, "princeton-battlefield": {"tips": ["Download the free NPS Battle of Princeton audio tour before visiting to get a vivid narration of troop movements as you walk the grounds.", "The Thomas Clarke House (open select weekends) contains period artifacts and a musket ball lodged in the wall -- check ahead for open hours.", "Walk the colonnade of trees along the main path at sunset for a hauntingly beautiful photo of the open battlefield."], "bestTime": "Visit in early January near the battle anniversary (January 3) for reenactments, or in autumn for golden foliage framing the fields.", "duration": "1-1.5 hours", "cost": "Free", "hours": "Dawn to dusk daily; Clarke House open select weekends", "dontMiss": "The Mercer Oak marker, commemorating the tree under which General Hugh Mercer fell during the 1777 battle."}, "morven-museum": {"tips": ["The five acres of restored colonial-era gardens behind the house are often overlooked -- walk through the kitchen garden and parterre for a peaceful escape.", "Combine your visit with a stroll down nearby Stockton Street to see other historic properties in the Princeton Historic District.", "Check the events calendar for seasonal garden parties and lecture series that offer deeper context on New Jersey's gubernatorial history."], "bestTime": "Late spring (May-June) when the gardens are in peak bloom and the wisteria-covered arbor is spectacular.", "duration": "1-1.5 hours", "cost": "$", "hours": "Wed-Sun 10am-4pm; closed Mon-Tue", "dontMiss": "The restored 18th-century garden, one of the finest examples of colonial landscape design in the mid-Atlantic region."}, "mccarter-theatre": {"tips": ["Book seats in the orchestra center rows F-L for the best sightlines -- the theater is intimate enough that even rear orchestra feels close.", "Student rush tickets are sometimes available at the box office 30 minutes before curtain at steep discounts.", "The adjacent Berlind Theatre hosts more experimental and contemporary works if you prefer cutting-edge performances over Broadway-style shows."], "bestTime": "The fall-to-spring theater season (October through May) offers the fullest programming, including world premieres.", "duration": "2-3 hours (performance length)", "cost": "$$-$$$", "hours": "Box office: Mon-Sat 10am-6pm; performance times vary", "dontMiss": "A production in the intimate 360-seat Berlind Theatre, where the small scale makes every performance feel like a private show."}, "dr-canal-state-park": {"tips": ["The towpath from Kingston to Rocky Hill (about 5 miles round trip) is flat, shaded, and perfect for an easy bike ride -- rent bikes in Princeton town.", "Kayakers and canoeists can launch from several access points; the section near Griggstown offers the most scenic, tree-canopied paddling.", "In winter, the frozen canal and bare trees create a stark, photogenic landscape that most visitors miss."], "bestTime": "Early fall for spectacular foliage reflected in the still canal water, or spring for wildflowers along the towpath.", "duration": "1.5-3 hours", "cost": "Free", "hours": "Dawn to dusk daily year-round", "dontMiss": "The wooden footbridge at the Griggstown Causeway, a photogenic spot where the canal meets the Millstone River."}, "nassau-street": {"tips": ["Labyrinth Books (next to campus) is an exceptional independent bookstore with a curated academic selection -- check their event board for author signings.", "Small World Coffee near the university gate is where locals and professors gather; grab an espresso and sit at the window for a true Princeton vibe.", "Walk the full length from Palmer Square to the university gate to see the transition from commercial district to Ivy League campus."], "bestTime": "Saturday mornings in spring or fall when the street is lively but not overcrowded with event traffic.", "duration": "1-2 hours", "cost": "Free", "hours": "Shops generally 10am-6pm, restaurants open later", "dontMiss": "The iconic view through the FitzRandolph Gate into Princeton's front campus from the Nassau Street sidewalk."}, "mit-museum": {"tips": ["Don't miss the kinetic sculpture gallery on the upper floor -- Arthur Ganson's mesmerizing machines are worth the visit alone.", "Wednesday at 11am there's a free guided tour included with admission that provides excellent context on the rotating exhibits.", "The museum is right next to the Kendall/MIT T stop; combine it with a walk through the MIT campus to see outdoor public art."], "bestTime": "Weekday mornings for the smallest crowds; avoid school vacation weeks when the interactive exhibits get very busy.", "duration": "1.5-2 hours", "cost": "$$", "hours": "Daily 10am-5pm", "dontMiss": "Arthur Ganson's gestural engineering sculptures -- intricate kinetic machines that blur the line between art and engineering."}, "charles-river-esplanade": {"tips": ["The stretch between the Longfellow Bridge and the Harvard Bridge offers the best skyline views -- go at sunset when the Back Bay buildings glow golden.", "The Community Boating dock near the Hatch Shell rents sailboats and kayaks from April through October at affordable rates.", "In summer, check the Hatch Shell schedule for free concerts and movie screenings on the lawn."], "bestTime": "Late April through October for outdoor activities; the July 4th concert and fireworks are iconic but extremely crowded.", "duration": "1-2 hours", "cost": "Free", "hours": "24/7 outdoor; boating seasonal Apr-Oct", "dontMiss": "The view of the Boston skyline from the Esplanade footbridge at sunset -- one of the most photographed spots in the city."}, "kendall-square": {"tips": ["Walk through the MIT campus from Kendall to see the Stata Center (Frank Gehry) and the MIT Chapel (Eero Saarinen) -- two of the most striking buildings in Boston.", "Area 4 and Catalyst are excellent local restaurants that attract the tech and academic crowd -- book dinner reservations.", "The Kendall Square Cinema (Landmark) shows independent and foreign films you won't find at mainstream theaters."], "bestTime": "Weekdays at lunchtime for the full energy of the innovation district; weekends are quieter.", "duration": "1-2 hours", "cost": "Free", "hours": "24/7 outdoor; shops and restaurants vary", "dontMiss": "The whimsical Kendall Band sound sculpture at the T station -- pull the levers to create musical sounds with the overhead installation."}, "harvard-square": {"tips": ["Duck into The Garage, a quirky mini-mall in a converted parking structure with independent shops and eateries on multiple levels.", "Street performers (buskers) are a Harvard Square institution -- the best ones perform near the T station entrance on weekend afternoons.", "Mr. Bartley's Burger Cottage serves creative burgers named after celebrities and politicians; expect a line but it moves fast."], "bestTime": "Spring and fall when Harvard students are on campus and the square buzzes with energy; summer is touristy but pleasant.", "duration": "1.5-2 hours", "cost": "Free", "hours": "24/7 outdoor; shops generally 10am-9pm", "dontMiss": "The Harvard Coop bookstore (since 1882) for Harvard-branded merchandise and a massive book selection across multiple floors."}, "museum-of-science": {"tips": ["Arrive right at 9am opening to beat school groups; head straight to the Planetarium or Lightning Show first, as those fill up quickest.", "Bundle your ticket with an Omni theater show or planetarium for just $6 more -- the dome films are genuinely spectacular.", "Boston Public Library cardholders can get free museum passes -- check the BPL website to reserve one in advance."], "bestTime": "Weekday afternoons (1-5pm) during the school year are the least crowded; avoid school vacation weeks.", "duration": "3-4 hours", "cost": "$$$", "hours": "Daily 9am-5pm (extended summer hours some days)", "dontMiss": "The live lightning show in the Theater of Electricity featuring the world's largest air-insulated Van de Graaff generator."}, "freedom-trail": {"tips": ["Walk the trail in reverse (start at Bunker Hill in Charlestown, end at Boston Common) to avoid the biggest crowds who start at the Common.", "Download the free Freedom Trail app for audio narration at each stop rather than paying for a guided tour.", "The Paul Revere House and Old North Church are the two interiors most worth entering; budget time for those and walk past the exterior-only sites."], "bestTime": "Early morning in spring or fall -- summer midday is hot and packed with tour groups.", "duration": "2.5-4 hours", "cost": "Free", "hours": "24/7 outdoor trail; individual sites vary (most open 9am-5pm)", "dontMiss": "The interior of the Paul Revere House, the oldest remaining structure in downtown Boston (built c. 1680)."}, "fenway-park": {"tips": ["Book the one-hour public tour in advance online -- on game days, tours sell out and the last tour departs 3 hours before first pitch.", "If attending a game, enter through Gate E to see the retired numbers and championship banners before the crowds fill in.", "Stand atop the Green Monster seats (included on most tours) for an unforgettable perspective of this bandbox ballpark."], "bestTime": "Tours run year-round; for a game, April-May and September offer the best weather and lower ticket prices.", "duration": "1 hour (tour) or 3-4 hours (game)", "cost": "$$$", "hours": "Tours daily on the hour, 9am-5pm (10am-5pm in winter); game days vary", "dontMiss": "Standing on top of the Green Monster (37 feet high) for a view down onto the field from the most iconic wall in baseball."}, "harvard-yard": {"tips": ["Enter through the Johnston Gate on Massachusetts Ave for the most dramatic first impression of the Yard's elm-lined paths.", "Rubbing John Harvard's left shoe for good luck is tradition, but the statue is famously known as the 'Statue of Three Lies' -- ask a student to explain why.", "Peek inside Memorial Hall (just north of the Yard) to see Annenberg Hall's stunning Harry Potter-esque dining room through the glass doors."], "bestTime": "Fall foliage season (mid-October) turns the Yard into a golden cathedral; early morning avoids tour groups.", "duration": "45 minutes-1 hour", "cost": "Free", "hours": "24/7 outdoor; campus buildings have limited public access", "dontMiss": "The John Harvard Statue and its three famous lies: it's not John Harvard, Harvard wasn't founded in 1638, and he wasn't the founder."}, "harvard-art-museums": {"tips": ["Head straight to the top floor's Lightbox Gallery where Renzo Piano's glass roof floods the space with natural light -- the best spot for photography.", "The Bauhaus collection (Level 2) is world-class and often overlooked by visitors who focus on the European paintings.", "Last Thursday of every month features 'At Night' events with free music, food, and art activities until 9pm."], "bestTime": "Weekday mornings for quiet gallery time; the monthly Thursday night event for a festive atmosphere.", "duration": "1.5-2 hours", "cost": "Free", "hours": "Tue-Sun 10am-5pm; closed Mon; last Thu open until 9pm", "dontMiss": "The Straus Center for Conservation on Level 5, where you can watch art conservators at work through glass walls -- a rare behind-the-scenes view."}, "harvard-natural-history": {"tips": ["The Glass Flowers (Blaschka Collection) are the star attraction -- over 4,000 exquisitely detailed botanical glass models that look impossibly real.", "The museum shares a building with the Peabody Museum of Archaeology; your ticket covers both, so plan extra time.", "The mineral and gem gallery on the upper floor is stunning but often emptier than the animal halls below."], "bestTime": "Weekday mornings during the school year; weekends can get busy with families.", "duration": "1.5-2 hours", "cost": "$$", "hours": "Daily 9am-5pm", "dontMiss": "The Blaschka Glass Flowers -- 4,300 hand-blown glass botanical models so lifelike they are routinely mistaken for real plants."}, "mount-auburn-cemetery": {"tips": ["Climb the Washington Tower (free) at the cemetery's highest point for a panoramic view stretching from the Boston skyline to Mount Wachusett.", "Pick up the free birding checklist at the entrance -- the cemetery is one of Greater Boston's premier birdwatching spots, especially during spring migration.", "Notable graves include Henry Wadsworth Longfellow, Winslow Homer, and Buckminster Fuller; grab a celebrity map at the gatehouse."], "bestTime": "Early May for peak spring warbler migration and blooming azaleas and rhododendrons simultaneously.", "duration": "1.5-2.5 hours", "cost": "Free", "hours": "Daily 8am-5pm (extended to 7pm in summer)", "dontMiss": "The view from the top of Washington Tower on a clear day -- you can see the Boston skyline, Blue Hills, and even Mount Monadnock in New Hampshire."}, "harvard-square-district": {"tips": ["Visit the Harvard Book Store (not the Coop) on Plympton Street for one of the best independent bookstores in America, especially their basement bargain section.", "Tealuxe (if still open) and the many cafes along Brattle Street provide a quieter, more literary atmosphere than the bustling main square.", "Walk down Brattle Street ('Tory Row') to see beautifully preserved colonial-era mansions once owned by Loyalists."], "bestTime": "September through November when students return and the cultural calendar is at its peak.", "duration": "1.5-3 hours", "cost": "Free", "hours": "24/7 outdoor; shops generally 10am-9pm", "dontMiss": "The Brattle Theatre, a 1890 repertory cinema showing classic, foreign, and independent films in a single-screen setting."}, "peabody-museum": {"tips": ["The Hall of the North American Indian contains one of the most comprehensive collections of Native American artifacts anywhere -- allow time to read the contextual panels.", "Your admission ticket also covers the Harvard Museum of Natural History next door, so plan for a combined visit.", "The museum's ethnographic collections from Mesoamerica and the Pacific Islands are particularly strong and less crowded than the main halls."], "bestTime": "Weekday mornings for the most contemplative experience; avoid holiday weekends.", "duration": "1-1.5 hours", "cost": "$$", "hours": "Daily 9am-5pm", "dontMiss": "The Lewis and Clark-era artifacts and the extensive collection of Maya ceramics and casts of Central American stelae."}, "charles-river-bike-path": {"tips": ["Rent a Bluebikes (Boston bike share) from any of the dozens of docking stations along the river -- it's the cheapest and most flexible way to ride the path.", "The Cambridge side of the river between Harvard and MIT offers the best unobstructed views of the Boston skyline.", "On Sundays from late spring through fall, Memorial Drive closes to cars for 'Riverbend Park,' creating a car-free cycling paradise."], "bestTime": "Late spring through early fall; Sunday mornings when Memorial Drive is closed to traffic are magical.", "duration": "1-3 hours", "cost": "Free", "hours": "24/7 outdoor path", "dontMiss": "The stretch between Harvard Bridge and BU Bridge on the Cambridge side at sunset, when the Charles River turns golden and the sailboats are out."}, "cantor-arts-center": {"tips": ["The outdoor Rodin Sculpture Garden has one of the largest collections of Rodin bronzes outside Paris -- walk it at golden hour for dramatic shadows and photos.", "The museum is free and uncrowded even on weekends; the contemporary art galleries on the second floor are particularly strong.", "Pick up a free campus walking tour map at the front desk to extend your visit with a self-guided architectural tour of Stanford."], "bestTime": "Year-round thanks to California weather; weekday afternoons for the quietest galleries.", "duration": "1.5-2 hours", "cost": "Free", "hours": "Wed-Mon 11am-5pm, Thu until 8pm; closed Tue", "dontMiss": "The Gates of Hell by Rodin in the sculpture garden -- a monumental 20-foot bronze door teeming with over 180 figures."}, "hoover-tower": {"tips": ["The observation deck on the 14th floor offers 360-degree views of campus and the Bay Area -- visit on a clear day when you can see all the way to San Francisco.", "Tickets ($8) are purchased at the door with card only (no cash); Stanford affiliates and one guest get in free with ID.", "The exhibition galleries on the ground floor are free and contain fascinating artifacts from Herbert Hoover's life and the history of the 20th century."], "bestTime": "Clear mornings offer the best visibility from the observation deck; avoid foggy days common in summer.", "duration": "30-45 minutes", "cost": "$", "hours": "Daily 10am-4pm (closed during academic breaks, finals, and football games)", "dontMiss": "The panoramic view from the 14th-floor observation deck on a clear day, when you can see from the San Francisco skyline to the Santa Cruz Mountains."}, "stanford-dish-trail": {"tips": ["Start early (the gate opens at sunrise) to beat the heat and the crowds -- by 10am on weekends the parking lot is full.", "The 3.7-mile loop is paved and moderately hilly; bring water and sun protection as there is zero shade on most of the trail.", "For the best photo of the iconic radio dish with rolling hills, take the counter-clockwise loop and stop about halfway up the first major hill."], "bestTime": "Early morning year-round; spring (March-April) for green hills and wildflowers before the grass turns golden.", "duration": "1-1.5 hours", "cost": "Free", "hours": "Daily sunrise to sunset; no bikes, dogs, or running on weekdays", "dontMiss": "The sweeping view from the top of the trail looking back over the entire Stanford campus with the Bay shimmering in the distance."}, "stanford-memorial-church": {"tips": ["Step inside to see the extraordinary mosaic murals covering the facade and interior -- the craftsmanship rivals European cathedrals.", "The church hosts free organ recitals and concerts throughout the academic year; check the Memorial Church website for the schedule.", "Visit at midday when sunlight streams through the stained glass windows, creating a kaleidoscope of color on the interior walls."], "bestTime": "Midday for the best interior light through stained glass; weekdays for fewest visitors.", "duration": "20-30 minutes", "cost": "Free", "hours": "Generally open daily 8am-5pm when not in use for services or events", "dontMiss": "The stunning Venetian mosaic on the church facade depicting the Sermon on the Mount, best viewed from the center of the Main Quad."}, "computer-history-museum": {"tips": ["The Revolution exhibit alone could take 3+ hours -- if you're short on time, focus on the AI/Chatbots Decoded exhibit and the mainframe gallery.", "The museum has a working IBM 1401 mainframe from 1959 that runs demonstrations on select days -- check the calendar for demo schedules.", "Tech industry professionals get a special thrill from the Babbage Engine and early Apple prototypes; allocate time for these highlights."], "bestTime": "Weekday mornings are very quiet; weekends can get busy with families.", "duration": "2-4 hours", "cost": "$$", "hours": "Wed-Sun 10am-5pm; closed Mon-Tue", "dontMiss": "The working Charles Babbage Difference Engine No. 2, one of only two ever built -- watch it calculate polynomial functions using 19th-century mechanical engineering."}, "baylands-nature-preserve": {"tips": ["Bring binoculars -- the preserve is a premier birdwatching site with over 150 species including egrets, herons, and migratory shorebirds.", "The boardwalk trail through the salt marshes is flat and accessible; the trail to the duck pond is the most rewarding short loop.", "Visit at low tide to see the mudflats teeming with shorebirds, or at high tide for kayaking opportunities in the slough."], "bestTime": "Winter months (November-February) for peak migratory bird populations; early morning any season for the best wildlife.", "duration": "1-2 hours", "cost": "Free", "hours": "Daily dawn to dusk; interpretive center has limited hours", "dontMiss": "The panoramic view of the San Francisco Bay and the East Bay hills from the levee trail at sunset."}, "university-avenue-palo-alto": {"tips": ["The restaurants along University Avenue range from casual to fine dining; Oren's Hummus and Tamarine are local favorites with Stanford crowds.", "Walk from the Caltrain station down University Ave toward campus -- the mile-long street perfectly captures Silicon Valley's blend of college town and tech hub.", "Side streets like Ramona and Emerson have more boutique shops and quieter cafes away from the main drag traffic."], "bestTime": "Weekend brunch time or weekday evenings when the dinner scene is vibrant.", "duration": "1-2 hours", "cost": "Free", "hours": "Shops generally 10am-8pm, restaurants open later", "dontMiss": "The Stanford Theatre, a beautifully restored 1925 movie palace that screens classic Hollywood films with a live organ prelude."}, "yale-art-gallery": {"tips": ["The building itself is a masterpiece -- the original 1953 Louis Kahn wing features a signature concrete ceiling; compare it with the adjacent Street Hall's classical architecture.", "Start on the fourth floor and work your way down so you begin with ancient art and end with contemporary -- the chronological flow is more satisfying.", "Free guided tours run daily and offer insights you won't get from labels alone; check the desk for the day's schedule."], "bestTime": "Weekday mornings for nearly empty galleries; Thursday late nights for a more social atmosphere.", "duration": "1.5-2 hours", "cost": "Free", "hours": "Tue-Fri 10am-5pm, Thu until 8pm, Sat-Sun 11am-5pm; closed Mon", "dontMiss": "Vincent van Gogh's The Night Cafe (1888), one of the gallery's crown jewels and a painting Van Gogh himself considered one of his ugliest."}, "beinecke-library": {"tips": ["The translucent marble panels on the exterior walls create an amber glow inside that shifts throughout the day -- midday sun produces the warmest light.", "The central glass tower holding the Gutenberg Bible and Audubon prints is visible from the ground floor; you cannot access the stacks but the view is mesmerizing.", "The sunken courtyard sculpture by Isamu Noguchi is easy to miss -- exit and look down into the geometric marble garden."], "bestTime": "Midday for the best amber glow through the marble walls; weekdays to avoid Yale campus tour crowds.", "duration": "30-45 minutes", "cost": "Free", "hours": "Mon-Fri 9am-7pm (Wed from 10am), Sat-Sun 12-5pm", "dontMiss": "The original Gutenberg Bible displayed in the glass book tower -- one of only 48 surviving copies in the world."}, "yale-peabody-museum": {"tips": ["The museum completed a major renovation and reopened with free admission and dramatically redesigned galleries -- it's essentially a new museum.", "Download the free Amuse digital guide before your visit for an interactive gallery map and exclusive content.", "The mineral hall and dinosaur galleries are the biggest draws; visit the less-crowded human evolution and ancient Egypt sections for a quieter experience."], "bestTime": "Weekday mornings for the smallest crowds; the museum gets busy on weekends especially with families.", "duration": "2-3 hours", "cost": "Free", "hours": "Tue-Sat 10am-5pm, Sun 12-5pm; closed Mon", "dontMiss": "The Great Hall of Dinosaurs featuring the iconic Age of Reptiles mural by Rudolph Zallinger, a 110-foot panorama painted from 1943-1947."}, "new-haven-green": {"tips": ["The three historic churches along Temple Street (Center Church, United Church, Trinity) form a stunning architectural trio -- peek inside Center Church to see the crypt underneath.", "The Green hosts the New Haven Festival of Arts & Ideas in June with many free performances and events.", "Grab a pizza from nearby Wooster Street and eat it on the Green for an ideal New Haven lunch."], "bestTime": "Late spring through early fall for events on the Green; June for the Festival of Arts & Ideas.", "duration": "30 minutes-1 hour", "cost": "Free", "hours": "24/7 outdoor", "dontMiss": "The crypt beneath Center Church on the Green, containing colonial-era headstones dating to the 1680s, visible by guided tour."}, "wooster-street": {"tips": ["Frank Pepe's and Sally's are the two legendary rivals -- go to Pepe's for the original coal-fired white clam pie and Sally's for a more intimate old-school experience.", "Expect 45-90 minute waits at peak times for both; put your name in at one and walk the neighborhood while you wait.", "Modern Apizza on State Street is the local third option that's just as good but rarely has a wait -- order the Italian Bomb."], "bestTime": "Weekday evenings or late lunch (after 2pm) to avoid the worst waits at Pepe's and Sally's.", "duration": "1.5-2 hours (including wait time)", "cost": "$-$$", "hours": "Most pizzerias open around 11:30am; Pepe's and Sally's close when they run out of dough (usually by 9-10pm)", "dontMiss": "Frank Pepe's Original White Clam Pie -- fresh littleneck clams, garlic, olive oil, and grated cheese on coal-fired thin crust. No mozzarella, no tomato."}, "yale-british-art": {"tips": ["This is the largest collection of British art outside the UK, housed in Louis Kahn's last building -- the natural light from the ceiling bays is intentional and changes the art throughout the day.", "The museum is rarely crowded even on weekends, making it one of the most pleasant museum experiences in the Northeast.", "Start on the fourth floor for the chronological flow from Tudor portraits down to contemporary British art."], "bestTime": "Midday for the best natural light through the Kahn-designed skylights; any weekday for near-solitude.", "duration": "1-1.5 hours", "cost": "Free", "hours": "Tue-Sat 10am-5pm, Sun 12-5pm; closed Mon", "dontMiss": "The collection of J.M.W. Turner paintings and watercolors, rivaling the Tate in London for quality and depth."}, "east-rock-park": {"tips": ["Drive or hike to the summit (about 1.5 miles from the base trailhead) for a 360-degree panorama of New Haven, Long Island Sound, and the Connecticut countryside.", "The road to the top is open to cars April through October but closed in winter -- in off-season you must hike the Giant Steps trail (steep but short).", "Sunset from the summit is the premier photo opportunity in New Haven; arrive 30 minutes early to claim a spot at the overlook railing."], "bestTime": "October for peak foliage seen from the summit; sunset any season for dramatic light over Long Island Sound.", "duration": "1-2 hours", "cost": "Free", "hours": "Park open daily dawn to dusk; summit road open Apr-Oct 8am-dusk", "dontMiss": "The panoramic view from the summit overlook at sunset, where you can see the entire New Haven skyline with Long Island Sound beyond."}, "robie-house": {"tips": ["Book the guided interior tour online in advance -- tours are limited to 14 people and sell out, especially on weekends.", "Pay attention to the art glass windows; Wright designed over 170 unique window patterns for this house, and the light through them changes constantly.", "Combine with the free self-guided outdoor audio tour (available in 8 languages) for the full architectural context of the surrounding block."], "bestTime": "Morning tours when sunlight streams through Wright's art glass windows creating extraordinary light patterns.", "duration": "1-1.5 hours", "cost": "$$", "hours": "Thu-Mon 9am-4pm; closed Tue-Wed", "dontMiss": "The 170+ art glass windows that Wright designed specifically for this house -- each one is a unique geometric composition that filters light like a kaleidoscope."}, "museum-science-industry": {"tips": ["Arrive at 9:30am opening and head directly to the U-505 submarine tour before it sells out -- the on-board tour is a separate timed ticket and the highlight of the museum.", "Chicago residents get significant discounts ($9 off adults) and Illinois residents get select free days -- always check before buying full-price tickets.", "The museum is enormous (400,000+ sq ft); focus on 2-3 areas rather than trying to see everything."], "bestTime": "Monday or Tuesday mornings are the quietest; avoid holiday weekends and summer Saturdays.", "duration": "3-5 hours", "cost": "$$", "hours": "Daily 9:30am-4pm", "dontMiss": "The U-505 submarine, a captured WWII German U-boat -- one of only five remaining in the world, and the on-board tour lets you walk through the actual vessel."}, "promontory-point": {"tips": ["Bring a blanket and snacks for a lakeside picnic on the limestone terraces -- this is where Hyde Park locals come to watch the sunset over the Chicago skyline.", "The point is a beloved spot for bonfires in the fire pits (first come, first served) -- bring your own wood and arrive before 5pm on summer weekends to claim one.", "The fieldhouse restrooms are open seasonally; in winter, come prepared."], "bestTime": "Summer evenings for bonfire gatherings and sunset views of the downtown skyline.", "duration": "1-2 hours", "cost": "Free", "hours": "Daily 6am-11pm", "dontMiss": "The unobstructed sunset view of the Chicago skyline from the limestone steps at the tip of the point -- bring a camera and a blanket."}, "seminary-coop": {"tips": ["The basement location packed floor-to-ceiling with academic titles is a bibliophile's dream -- ask the staff for recommendations; they are extraordinarily well-read.", "Check the events calendar for author readings and book signings, which attract major literary and intellectual figures thanks to the UChicago connection.", "The 57th Street Books (same co-op, around the corner) has a cozier vibe and better fiction/children's sections."], "bestTime": "Weekday afternoons when you can browse in peace; event nights for stimulating author conversations.", "duration": "30 minutes-1.5 hours", "cost": "Free", "hours": "Mon-Sat 10am-8pm, Sun 11am-6pm", "dontMiss": "The unmatched academic philosophy and social theory section -- widely considered the best curated selection in any US bookstore."}, "rockefeller-chapel": {"tips": ["Attend one of the free carillon concerts (usually Sundays at noon) performed from the 72-bell Laura Spelman Rockefeller Memorial Carillon, the second-largest in the world.", "The chapel's interior is modeled on the great English Gothic cathedrals; look up to appreciate the 80-foot stone vaulted ceiling.", "The chapel regularly hosts choral performances and organ concerts -- check the UChicago events calendar for the schedule."], "bestTime": "Sunday around noon for the carillon concert; weekday mornings for quiet interior contemplation.", "duration": "20-45 minutes", "cost": "Free", "hours": "Daily 8am-5pm; event hours vary", "dontMiss": "The 72-bell carillon, the second-largest by total weight in the world, played from a cabin high in the tower during regular Sunday concerts."}, "osaka-garden": {"tips": ["This hidden gem on the Wooded Island in Jackson Park is one of Chicago's most tranquil spots -- most tourists don't know it exists.", "Cross the wooden bridges and follow the winding path around the koi pond for a contemplative Japanese garden experience.", "The garden traces its origins to the 1893 World's Columbian Exposition -- read the historical plaques along the path."], "bestTime": "Spring cherry blossom season (late April) or fall foliage (October) for the most scenic visit.", "duration": "30-45 minutes", "cost": "Free", "hours": "Daily dawn to dusk", "dontMiss": "The serene Moon Bridge reflected in the pond, framed by cherry blossoms in spring -- one of Chicago's most peaceful and photogenic spots."}, "court-theatre": {"tips": ["With only 251 seats, every seat feels intimate; the thrust stage puts you remarkably close to the actors.", "UChicago students and staff often get discounted tickets; non-affiliates should check for rush or preview night pricing.", "The theater's focus on classic and contemporary drama means you'll see challenging works performed at a professional level rarely found in university-adjacent theaters."], "bestTime": "The main season runs October through June; preview performances (usually the first few shows of a run) are cheaper.", "duration": "2-3 hours", "cost": "$$", "hours": "Box office: Tue-Sun 12-6pm; performance times vary (usually evenings & weekend matinees)", "dontMiss": "A performance in the intimate thrust-stage configuration, where no seat is more than about 10 rows from the actors."}, "duke-gardens": {"tips": ["The Terraces section is the most photographed area, with formal Italian-style gardens descending toward a fish pool -- visit early morning for mist and soft light.", "The Blomquist Garden of Native Plants is often skipped but offers a beautiful walk through Piedmont woodland with labeled native species.", "Bring a picnic (there are designated areas) but food is not allowed inside the walled Terraces."], "bestTime": "Mid-April for peak tulip and wisteria bloom in the Terraces; fall for Japanese maple color in the Asiatic Arboretum.", "duration": "1.5-2.5 hours", "cost": "Free", "hours": "Daily 8am-dusk", "dontMiss": "The Terraces garden in full spring bloom (mid-April), when thousands of tulips and cascading wisteria create one of the most beautiful scenes in the American South."}, "duke-chapel": {"tips": ["The 50-bell carillon plays before services and at special events -- time your visit to hear it from the outside lawn for the full acoustic effect.", "Step inside to see the 77 stained glass windows depicting over 800 figures; bring binoculars to appreciate the upper clerestory windows.", "The chapel is a functioning worship space; Sunday services (11am) feature excellent choral music by the Duke Chapel Choir."], "bestTime": "Weekday mornings for quiet interior visits; Sunday 11am service for the full choral experience.", "duration": "30-45 minutes", "cost": "Free", "hours": "Daily 8am-10pm; tours available Mon-Fri", "dontMiss": "The 5,200-pipe Flentrop organ and the 77 stained glass windows -- attend a service or recital to hear the organ fill the Gothic nave."}, "duke-lemur-center": {"tips": ["All visits require advance reservations and sell out quickly -- book your tour as soon as registration opens (usually 2 months ahead for the May-September season).", "The Walking with Lemurs tour ($85) lets you walk among free-ranging lemurs in forest enclosures with no barriers -- it's an extraordinary wildlife experience.", "Wear close-toed shoes, bring sunscreen, and be prepared for outdoor conditions; the general tour is self-paced over a 2-hour window."], "bestTime": "May through September is the only season for most tours; early morning Walking with Lemurs tours (8:30am) are magical.", "duration": "1-1.5 hours", "cost": "$$", "hours": "Tours Thu-Sun, May-Sep; gift shop daily (except Tue) 10am-4pm", "dontMiss": "The Walking with Lemurs tour where you enter forested enclosures and observe ring-tailed and other lemurs from just six feet away with no barriers."}, "nasher-museum": {"tips": ["The building itself, designed by Rafael Vinoly, is a work of art -- the soaring glass-and-steel entrance hall floods with natural light.", "The museum's focus on contemporary art from underrepresented voices makes it different from typical university art museums.", "Free admission for Duke students and employees; check for community free days throughout the year."], "bestTime": "Weekdays for the quietest experience; openings and special events are worth attending for the social atmosphere.", "duration": "1-1.5 hours", "cost": "$", "hours": "Tue-Sat 10am-5pm, Thu until 9pm, Sun 12-5pm; closed Mon", "dontMiss": "The rotating contemporary exhibitions in the main gallery under the dramatic five-pointed roof, which changes the feel of the space with each new show."}, "american-tobacco-campus": {"tips": ["The renovated warehouses now house restaurants, offices, and entertainment venues -- explore the central water feature and the wooden boardwalk area.", "Check the events calendar for free outdoor concerts and festivals in the courtyard, especially during Durham's warm months.", "Grab lunch at one of the campus restaurants (Mellow Mushroom, Tyler's Taproom) and eat in the open-air brick courtyards."], "bestTime": "Evenings in spring and fall when the outdoor dining patios and event spaces are most alive.", "duration": "1-1.5 hours", "cost": "Free", "hours": "Open-air campus 24/7; shops and restaurants vary (most 11am-10pm)", "dontMiss": "The Lucky Strike water tower and the man-made stream running through the campus center -- a symbol of Durham's creative reinvention of its industrial past."}, "durham-bulls": {"tips": ["Sit along the first base line for the best view of the famous bull that snorts smoke after home runs -- general admission grass seats on the outfield berm are cheapest.", "The ballpark was made famous by the movie Bull Durham; look for movie memorabilia displayed inside the concourse.", "Thursday games (Thirsty Thursdays) have discounted beer; Friday games end with fireworks."], "bestTime": "April through September during the minor league season; Friday nights for post-game fireworks.", "duration": "2.5-3 hours", "cost": "$-$$", "hours": "Game times vary (usually 6:35pm weekdays, 5:05pm weekends); box office opens 10am on game days", "dontMiss": "The bull sculpture beyond the outfield wall that snorts smoke and flashes its eyes every time a Durham Bull hits a home run."}, "eno-river": {"tips": ["The Cox Mountain Trail is the most rewarding hike -- a moderate 4-mile loop with river views, rocky bluffs, and minimal crowds.", "Bring water shoes; wading and swimming holes along the river are the main summer attraction, especially near the Few's Ford access point.", "The park has multiple disconnected access points -- check the trail map and choose your parking area based on which trail you want."], "bestTime": "Spring for wildflowers and rushing water; summer for swimming holes; fall for spectacular foliage.", "duration": "2-3 hours", "cost": "Free", "hours": "Daily 8am-sunset (varies seasonally from 6pm in winter to 9pm in summer)", "dontMiss": "A swim in the deep pools below the rocky shoals at Few's Ford on a hot summer day -- a beloved Durham tradition."}, "baltimore-museum-art": {"tips": ["The Cone Collection of Matisse paintings (the largest in the world) is the crown jewel -- allow dedicated time in these galleries on the second floor.", "The contemporary wing and sculpture garden are both free and excellent; the outdoor sculpture garden has a view over Wyman Park.", "First Thursdays feature free evening events with live music and cocktails -- a great way to experience the museum socially."], "bestTime": "Weekday mornings for quiet gallery time; First Thursday evenings for a social museum experience.", "duration": "1.5-2.5 hours", "cost": "Free", "hours": "Wed-Sun 10am-5pm, Thu until 9pm; closed Mon-Tue", "dontMiss": "The Cone Collection galleries housing the world's largest holding of Henri Matisse works, including his major paintings and cut-outs."}, "peabody-library": {"tips": ["The atrium with five tiers of ornate cast-iron balconies rising 61 feet to a skylight is one of the most photographed interiors in America -- bring a wide-angle lens.", "The library is a closed-stacks facility; you can't browse books, but the architecture alone is worth the visit. Access is limited to the ground floor.", "Hours are limited and vary week to week -- always verify on the JHU website before visiting to avoid a closed door."], "bestTime": "Midday on a sunny weekday when natural light floods through the skylight; avoid weekends when hours are most limited.", "duration": "20-30 minutes", "cost": "Free", "hours": "Varies; generally Tue-Thu 10am-5pm, limited Fri-Sun hours (check JHU website)", "dontMiss": "Standing in the center of the main atrium and looking straight up through five tiers of ornate cast-iron balconies to the glass skylight 61 feet above."}, "national-aquarium": {"tips": ["Go on Friday evenings after 5pm for half-price admission ($24.95) -- the aquarium is less crowded and the lighting creates a more atmospheric experience.", "Maryland residents save $10 off admission on weekday mornings before noon (must buy tickets on-site with proof of residency).", "Head to the rooftop rainforest exhibit first before descending; most visitors start at the bottom and create a bottleneck."], "bestTime": "Friday evenings for half-price admission and thinner crowds; weekday mornings for Maryland residents.", "duration": "2-3 hours", "cost": "$$$", "hours": "Mon-Thu & Sat-Sun 9am-6pm, Fri 9am-9pm", "dontMiss": "The Blacktip Reef exhibit, a 260,000-gallon shark tank with a floor-to-ceiling viewing window where you stand inches from circling sharks and rays."}, "fort-mchenry": {"tips": ["Watch the 15-minute orientation film first -- it ends with a dramatic curtain reveal of the actual flag-shaped fort through a window, one of the best museum reveals anywhere.", "Walk the full perimeter of the star fort ramparts for views of Baltimore Harbor and to understand the fort's strategic position during the 1814 bombardment.", "The NPS ranger talks (check the schedule at the visitor center) bring the Battle of Baltimore vividly to life."], "bestTime": "Late spring or early fall for comfortable walking weather; September for the Star-Spangled Banner Weekend celebration.", "duration": "1-1.5 hours", "cost": "$", "hours": "Daily 9am-5pm (extended to 5:45pm Memorial Day-Labor Day); closed Jan 1, Thanksgiving, Christmas", "dontMiss": "The orientation film's finale: the screen lifts to reveal the actual fort and its enormous American flag through a window -- a genuinely moving patriotic moment."}, "camden-yards": {"tips": ["The Eutaw Street promenade beyond the right field wall is open to ticketholders and features bronze baseballs marking where home runs landed -- walk it before the game.", "Sit in the upper deck behind home plate for the best view of the iconic warehouse beyond right field and the downtown skyline.", "Boog's BBQ on Eutaw Street is a ballpark institution -- get the pit beef sandwich before the game."], "bestTime": "April-May and September for ideal baseball weather; weeknight games for easier ticket availability and less crowding.", "duration": "3-4 hours (game)", "cost": "$$-$$$", "hours": "Gates open 1.5 hours before first pitch; game times vary", "dontMiss": "Boog's BBQ on Eutaw Street, where Orioles legend Boog Powell sometimes still serves his famous pit beef sandwiches before games."}, "visionary-art-museum": {"tips": ["The outdoor sculpture plaza overlooking the Inner Harbor is free to visit even without museum admission -- it's one of Baltimore's best photo spots.", "Every exhibit is created by self-taught artists; the rotating annual theme exhibits are inventive and unlike anything in a traditional museum.", "The museum's Kinetic Sculpture Race (May) is a beloved Baltimore event where human-powered sculptures race through the city and harbor."], "bestTime": "Weekdays for the quietest experience; May for the annual Kinetic Sculpture Race.", "duration": "1.5-2 hours", "cost": "$$", "hours": "Wed-Sun 10am-5pm; closed Mon-Tue", "dontMiss": "The giant whirligig sculpture by Vollis Simpson in front of the museum -- a 55-foot tall kinetic wind sculpture that moves in the breeze."}, "fells-point": {"tips": ["The cobblestone streets along Thames Street are lined with over 120 bars and restaurants -- The Horse You Came In On (allegedly Poe's last bar) is a must-visit for history buffs.", "Saturday mornings feature the Broadway Market (operating since 1786), one of America's oldest continuously operating public markets.", "Park at one of the garages on Fleet Street rather than circling for scarce street parking on the cobblestones."], "bestTime": "Saturday mornings for the Broadway Market; warm evenings for waterfront dining and bar-hopping.", "duration": "2-3 hours", "cost": "Free", "hours": "24/7 outdoor; most venues open 11am-2am", "dontMiss": "The waterfront promenade along Thames Street at twilight, when the harbor lights reflect off the water and the historic rowhouses glow."}, "lake-michigan-shoreline": {"tips": ["The Northwestern campus beaches (Clark Street Beach especially) offer a peaceful Lake Michigan experience far from the Chicago beach crowds.", "Walk the Lakefill, a man-made peninsula built by Northwestern in the 1960s, for unobstructed views of the Chicago skyline to the south.", "In winter, the ice formations along the lakeshore create surreal frozen sculptures -- dress warmly and bring a camera."], "bestTime": "Summer (June-August) for swimming and beach days; winter for dramatic ice formations along the shore.", "duration": "1-2 hours", "cost": "Free", "hours": "24/7 outdoor; some beach areas have lifeguard hours in summer", "dontMiss": "The view of the Chicago skyline from the tip of the Lakefill on a clear day -- the downtown towers shimmer 12 miles to the south."}, "block-museum": {"tips": ["This small but curated museum punches above its weight with ambitious temporary exhibitions that rival larger Chicago museums -- check what's on before visiting.", "The museum is free and uncrowded, making it a perfect quick cultural stop while exploring the Northwestern campus.", "Ask at the front desk about any ongoing artist talks or film screenings; the Block's programming is exceptionally well-curated."], "bestTime": "During the academic year (October-May) when exhibitions and programming are at full capacity.", "duration": "45 minutes-1 hour", "cost": "Free", "hours": "Tue-Sun 10am-5pm, Thu until 8pm; closed Mon", "dontMiss": "The rotating contemporary art exhibitions that consistently surprise visitors with their quality and ambition relative to the museum's intimate size."}, "grosse-point-lighthouse": {"tips": ["Tours are extremely limited: summer weekends only, three tours per day at 2pm, 3pm, and 4pm, with just 8 people per tour -- arrive at least 15 minutes early.", "You must climb 141 steps to the top of the tower; wear sturdy shoes and be prepared for a narrow, steep spiral staircase.", "The Lady Elgin shipwreck exhibit inside the keeper's dwelling tells the tragic 1860 story that prompted the lighthouse's construction."], "bestTime": "A clear summer Saturday or Sunday afternoon for the tower climb and views across Lake Michigan.", "duration": "45 minutes-1 hour", "cost": "$", "hours": "Tours Sat-Sun 2pm, 3pm, 4pm, June-September only; grounds open year-round", "dontMiss": "The view from the top of the 113-foot tower looking out over Lake Michigan -- on a clear day you can see the Chicago skyline to the south."}, "downtown-evanston": {"tips": ["The intersection of Church Street and Sherman Avenue is the heart of downtown -- explore the independent shops and restaurants radiating outward.", "Bookends & Beginnings, a hidden bookstore in an alley, is a beloved local treasure worth seeking out.", "The Davis Street CTA/Metra station makes Evanston easily accessible from downtown Chicago in about 30 minutes."], "bestTime": "Weekend afternoons in spring or fall for outdoor dining along Sherman Avenue.", "duration": "1-2 hours", "cost": "Free", "hours": "Shops generally 10am-8pm, restaurants open later", "dontMiss": "Bookends & Beginnings, a cozy independent bookstore hidden in an alley off Sherman Avenue, packed with curated titles and literary charm."}, "mitchell-museum": {"tips": ["One of only a handful of museums in the US exclusively dedicated to Native American and First Nations cultures -- the collection spans 10,000 years.", "The museum regularly hosts hands-on workshops and demonstrations by Native artisans; check the events calendar for these intimate, educational experiences.", "The gift shop carries authentic Native American crafts and jewelry sourced directly from tribal artists."], "bestTime": "Weekday afternoons for the quietest visits; check for special event weekends featuring artisan demonstrations.", "duration": "1-1.5 hours", "cost": "$", "hours": "Tue-Sat 10am-5pm, Sun 12-4pm; closed Mon", "dontMiss": "The collection of Northwest Coast carved masks and totem artifacts, displaying some of the most intricate indigenous woodcarving artistry on the continent."}, "chicago-skyline": {"tips": ["Take the CTA Purple Line Express from Davis Street (Evanston) to the Loop in about 35 minutes -- the elevated tracks through the North Side neighborhoods are a sightseeing experience themselves.", "The Metra UP-North line from Evanston to Ogilvie Station is faster and more comfortable but runs less frequently.", "Get off at the Merchandise Mart or Washington/Wabash stops for the most dramatic first views of the Loop's architecture."], "bestTime": "Clear evenings in fall or winter when the skyline is sharpest and the city lights are most dramatic.", "duration": "Half day to full day (depending on Chicago activities)", "cost": "$", "hours": "CTA trains run roughly 4am-1am; Metra schedule varies", "dontMiss": "The view of the Loop skyline from the Chicago Riverwalk at twilight, when the buildings light up and reflect off the river."}, "shakespeare-garden": {"tips": ["This hidden campus garden behind Garrett-Evangelical Seminary contains flowers and plants mentioned in Shakespeare's works, each labeled with the relevant quote.", "The garden is tiny (under half an acre) but enchanting -- it's a perfect quiet study break spot and one of Northwestern's best-kept secrets.", "A stone bench at the center makes an ideal spot for reading or reflection, away from campus noise."], "bestTime": "Late spring through early fall when the perennial flowers are in bloom; mid-June for peak roses.", "duration": "15-30 minutes", "cost": "Free", "hours": "Dawn to dusk daily", "dontMiss": "The individually labeled plants with their corresponding Shakespeare quotations -- a literary garden walk that brings the Bard's imagery to life."}, "penn-museum": {"tips": ["The Egyptian galleries with massive sphinx and architectural elements are the star attraction -- new Egypt Galleries are being expanded with a major opening planned for late 2026.", "Download the free Bloomberg Connects digital guide before your visit for self-guided tours with expert commentary.", "The museum's Mesopotamian and Chinese collections are world-class but far less crowded than the Egyptian section."], "bestTime": "Weekday mornings for the quietest galleries; First Wednesday evenings for special wellness-themed late-night events.", "duration": "1.5-2.5 hours", "cost": "$$", "hours": "Tue-Sun 10am-5pm; closed Mon", "dontMiss": "The 12-ton granite Sphinx of Ramesses II, the largest sphinx in the Western Hemisphere, holding court in the Egyptian gallery."}, "independence-hall": {"tips": ["Free timed tickets are required and distributed at the Independence Visitor Center starting at 8:30am (or reserve online in advance for a $1 fee) -- in summer they run out by midmorning.", "See the Liberty Bell first (no ticket needed, just a security line) then head to your timed Independence Hall tour.", "The ranger-led tour of Independence Hall is excellent and only about 30 minutes; combine it with nearby Congress Hall and Old City Hall for the full experience."], "bestTime": "Early morning on a weekday in spring or fall to avoid summer tourist crowds and school groups.", "duration": "1-2 hours (including Liberty Bell)", "cost": "Free", "hours": "Daily 9am-5pm (extended summer hours); Liberty Bell Center 9am-5pm", "dontMiss": "Standing in the Assembly Room where both the Declaration of Independence and the U.S. Constitution were debated and signed."}, "philadelphia-museum-art": {"tips": ["Most visitors run up the 'Rocky Steps' and leave -- go inside for one of America's finest art collections, including entire reconstructed rooms (medieval cloister, Japanese tea house, Chinese palace hall).", "Friday evenings feature Art After 5 with live music, cocktails, and gallery access -- a very different museum vibe from daytime.", "Your ticket is valid for two consecutive days and includes the nearby Rodin Museum -- plan to use both days."], "bestTime": "Weekday mornings for empty galleries; Friday evenings for the Art After 5 social experience.", "duration": "2-4 hours", "cost": "$$", "hours": "Thu-Mon 10am-5pm, Fri until 8:45pm; closed Tue-Wed", "dontMiss": "The reconstructed medieval cloister from a 12th-century French abbey and the Arms & Armor gallery -- entire architectural spaces transported stone-by-stone into the museum."}, "reading-terminal-market": {"tips": ["Arrive before 10am on a weekday to beat the lunch rush -- by noon the aisles are packed and lines are long.", "Must-eat stops: DiNic's roast pork sandwich (Anthony Bourdain's favorite), Beiler's doughnuts (Amish country recipe), and Bassetts Ice Cream (America's oldest ice cream company, since 1861).", "The Amish vendors (Tue, Thu, Sat only) sell exceptional baked goods, cheeses, and meats -- Saturday is the fullest Amish market day."], "bestTime": "Weekday mornings before 10am for the shortest lines; Thursday or Saturday for the full Amish vendor experience.", "duration": "1-1.5 hours", "cost": "$", "hours": "Daily 8am-6pm (some vendors closed Sun-Mon)", "dontMiss": "DiNic's roast pork sandwich with sharp provolone and broccoli rabe -- consistently ranked among the best sandwiches in America."}, "schuylkill-river-trail": {"tips": ["The section from the Art Museum to Falls Bridge (about 4 miles round trip) passes through stunning scenery including Boathouse Row and the historic rowing houses.", "Rent a bike from Indego (Philly bike share) at the Art Museum station for a quick ride along the river -- the trail is flat and paved.", "At night, Boathouse Row lights up with LED outlines of each boathouse, creating one of Philadelphia's most iconic nighttime views."], "bestTime": "Spring and fall for ideal running/cycling weather; any clear evening for the illuminated Boathouse Row view.", "duration": "1-2.5 hours", "cost": "Free", "hours": "24/7 outdoor path; some sections lit at night", "dontMiss": "The view of Boathouse Row illuminated at night from the trail or the Spring Garden Bridge -- the glowing boathouses reflected in the Schuylkill are magical."}, "barnes-foundation": {"tips": ["The art is hung in 'ensembles' exactly as Albert Barnes arranged them -- metalwork, furniture, and paintings grouped by formal relationships rather than chronology or artist, making it a unique viewing experience.", "Timed entry tickets are required; book online in advance, especially for weekends. Your ticket is valid for two consecutive days.", "Thursday-Monday only (closed Tue-Wed); the guided tour ($39 weekday, $49 weekend) is worthwhile for first-timers to understand Barnes's radical hanging philosophy."], "bestTime": "Weekday mornings or after 2pm on weekends for the thinnest crowds in the intimate galleries.", "duration": "1.5-2.5 hours", "cost": "$$", "hours": "Thu-Mon 11am-5pm; closed Tue-Wed", "dontMiss": "The main gallery room with works by Renoir, Cezanne, and Matisse hung side-by-side with ironwork hinges and African sculpture -- Albert Barnes's original radical vision of art education."}, "cira-green": {"tips": ["This elevated park sits on top of a parking garage (7th floor) and is one of Philly's best-kept secrets for skyline views -- most tourists don't know it exists.", "The park has free artificial turf lawns, a beer garden (seasonal), and stunning views of the Schuylkill River, Center City, and University City.", "Come at sunset with takeout food from nearby restaurants for one of Philadelphia's best free outdoor experiences."], "bestTime": "Sunset on a clear evening for golden-hour views of the Philadelphia skyline and the Schuylkill River.", "duration": "30 minutes-1 hour", "cost": "Free", "hours": "Daily 7am-9pm (extended hours in summer)", "dontMiss": "The panoramic sunset view of the Philadelphia skyline from this hidden rooftop park -- a perfect end to a day exploring University City."}};
+
+    // State
+    let allPlaces = [];
+    let currentModalIndex = -1;
+
+    function init() {
+      // Build flat list of all places with university context
+      DATA.universities.forEach(uni => {
+        uni.placesToVisit.forEach(place => {
+          const slug = place.image.replace('.jpg','').replace('.png','');
+          allPlaces.push({ ...place, slug, uniName: uni.name, uniRank: uni.rank });
+        });
+      });
+      renderNav(DATA.universities);
+      renderMain(DATA.universities);
+      setupScrollSpy();
+      setupModal();
+    }
+
+    function renderNav(universities) {
+      const nav = document.getElementById('nav-links');
+      nav.innerHTML = universities.map(uni => {
+        const id = uni.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const short = uni.name.replace('University of ', 'U').replace('Massachusetts Institute of Technology (MIT)', 'MIT').replace(' University', '');
+        return `<a href="#${id}" class="nav-link" data-target="${id}">${short}</a>`;
+      }).join('');
+    }
+
+    function starSvg() {
+      return '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01z"/></svg>';
+    }
+
+    function renderMain(universities) {
+      const main = document.getElementById('main');
+      main.innerHTML = universities.map(uni => {
+        const id = uni.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return `
+          <section class="university-section" id="${id}">
+            <div class="uni-header">
+              <span class="uni-rank">#${uni.rank}</span>
+              <h2 class="uni-name">${uni.name}</h2>
+            </div>
+            <div class="uni-location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              ${uni.location.city}, ${uni.location.state}
+            </div>
+            <p class="uni-description">${uni.description}</p>
+            <div class="places-grid">
+              ${uni.placesToVisit.map(place => {
+                const slug = place.image.replace('.jpg','').replace('.png','');
+                const tips = TIPS[slug] || {};
+                const idx = allPlaces.findIndex(p => p.slug === slug);
+                const cat = getCategory(place.type);
+                const costVal = (TIPS[slug] || {}).cost || '';
+                return `
+                <div class="place-card" data-cat="${cat}" data-cost="${costVal}" data-name="${place.name.toLowerCase()}" data-slug="${slug}" onclick="openModal(${idx})">
+                  <div class="place-img-container">
+                    <img class="place-img" src="../images/${place.image}" alt="${place.name}" loading="lazy">
+                    <div class="place-img-overlay"></div>
+                    <span class="click-hint">Click for details</span>
+                  </div>
+                  <div class="place-body">
+                    <div class="place-top-row">
+                      <span class="place-type">${place.type}</span>
+                      <span class="place-rating">${starSvg()} ${place.rating}</span>
+                    </div>
+                    <h3 class="place-name">${place.name}</h3>
+                    <p class="place-description">${place.description}</p>
+                    <div class="place-meta">
+                      <div class="place-distance">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        ${place.distanceFromCampus}
+                      </div>
+                      ${tips.cost ? `<div class="place-cost-badge">${tips.cost}</div>` : ''}
+                      ${tips.duration ? `<div class="place-duration-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        ${tips.duration}
+                      </div>` : ''}
+                    </div>
+                  </div>
+                </div>
+              `}).join('')}
+            </div>
+          </section>
+        `;
+      }).join('');
+    }
+
+    function openModal(index) {
+      if (index < 0 || index >= allPlaces.length) return;
+      currentModalIndex = index;
+      const place = allPlaces[index];
+      const tips = TIPS[place.slug] || {};
+      const modal = document.getElementById('modal');
+
+      modal.innerHTML = `
+        <div class="modal-hero">
+          <img src="../images/${place.image}" alt="${place.name}">
+          <div class="modal-hero-overlay"></div>
+          <button class="modal-close" onclick="closeModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="modal-nav prev" onclick="navigateModal(-1)" ${index === 0 ? 'disabled' : ''}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="modal-nav next" onclick="navigateModal(1)" ${index === allPlaces.length - 1 ? 'disabled' : ''}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-header">
+            <div class="modal-uni-name">#${place.uniRank} ${place.uniName}</div>
+            <h2 class="modal-place-name">${place.name}</h2>
+            <div class="modal-meta-row">
+              <span class="modal-badge rating">${starSvg()} ${place.rating}</span>
+              <span class="modal-badge">${place.type}</span>
+              <span class="modal-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${place.distanceFromCampus}
+              </span>
+              ${tips.cost ? `<span class="modal-badge cost">${tips.cost}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">About</div>
+            <p class="modal-description">${place.description}</p>
+          </div>
+
+          <div class="modal-info-grid modal-section">
+            <div class="info-card">
+              <div class="info-card-label">Suggested Duration</div>
+              <div class="info-card-value">${tips.duration || '1-2 hours'}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Best Time to Visit</div>
+              <div class="info-card-value">${tips.bestTime || 'Year-round'}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Admission</div>
+              <div class="info-card-value">${tips.cost || 'Varies'}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Hours</div>
+              <div class="info-card-value">${tips.hours || 'Check website'}</div>
+            </div>
+          </div>
+
+          ${tips.dontMiss ? `
+          <div class="modal-section">
+            <div class="dont-miss">
+              <div class="dont-miss-icon">&#9733;</div>
+              <div>
+                <div class="dont-miss-label">Don't Miss</div>
+                <div class="dont-miss-text">${tips.dontMiss}</div>
+              </div>
+            </div>
+          </div>` : ''}
+
+          ${tips.tips && tips.tips.length ? `
+          <div class="modal-section">
+            <div class="modal-section-title">Expert Tips</div>
+            <ul class="tips-list">
+              ${tips.tips.map((tip, i) => `
+                <li class="tip-item">
+                  <div class="tip-icon">${i + 1}</div>
+                  <div class="tip-text">${tip}</div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>` : ''}
+
+          <div class="modal-section">
+            <div class="modal-section-title">Visitor Review</div>
+            <div class="modal-review">
+              <p>"${place.review}"</p>
+              <div class="reviewer">— ${place.reviewer}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modalOverlay').classList.add('active');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.body.classList.remove('modal-open');
+      currentModalIndex = -1;
+    }
+
+    function navigateModal(dir) {
+      const next = currentModalIndex + dir;
+      if (next >= 0 && next < allPlaces.length) {
+        openModal(next);
+        document.getElementById('modal').scrollTop = 0;
+      }
+    }
+
+    function setupModal() {
+      document.getElementById('modalOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (currentModalIndex === -1) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') navigateModal(-1);
+        if (e.key === 'ArrowRight') navigateModal(1);
+      });
+    }
+
+    function setupScrollSpy() {
+      const sections = document.querySelectorAll('.university-section');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector(`.nav-link[data-target="${entry.target.id}"]`);
+            if (active) {
+              active.classList.add('active');
+              active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+          }
+        });
+      }, { rootMargin: '-20% 0px -80% 0px' });
+      sections.forEach(s => observer.observe(s));
+    }
+
+    // ---- Category mapping ----
+    const CAT_MAP = {
+      museum: ['museum','art museum','natural history museum','technology museum','science museum','historic library','aquarium','art museum & sculpture garden'],
+      nature: ['waterfront park','hiking trail','nature & recreation','outdoor recreation','state park & nature','nature preserve','japanese garden','botanical garden','garden & campus green space','waterfront & beaches','lakefront park & scenic viewpoint','wildlife sanctuary','rooftop park','nature & scenic viewpoint'],
+      historic: ['historic site & park','historic campus landmark','historic landmark','architectural landmark','library & architectural landmark','historic main street','historic waterfront neighborhood','historic district','historic park','historic chapel & landmark','historic walking tour','campus landmark & observation deck','historic house museum','historic chapel & concert venue'],
+      food: ['restaurant district','food market','shopping & dining district','historic shopping & cultural district','shopping & cultural district','innovation district'],
+      arts: ['independent bookstore','performing arts venue','professional theater','world-class city'],
+      sports: ['sports landmark','sports venue']
+    };
+
+    function getCategory(type) {
+      const t = type.toLowerCase();
+      for (const [cat, types] of Object.entries(CAT_MAP)) {
+        if (types.some(x => t.includes(x) || x.includes(t))) return cat;
+      }
+      return 'other';
+    }
+
+    // ---- Filter state ----
+    let filterCat = 'all';
+    let filterCost = 'all';
+
+    function setCat(btn, cat) {
+      document.querySelectorAll('.fpill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterCat = cat;
+      applyFilter();
+    }
+
+    function setCost(btn, cost) {
+      document.querySelectorAll('.cpill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterCost = cost;
+      applyFilter();
+    }
+
+    function applyFilter() {
+      const search = document.getElementById('filterSearch').value.toLowerCase().trim();
+      let visible = 0;
+
+      document.querySelectorAll('.place-card').forEach(card => {
+        const matchCat = filterCat === 'all' || card.dataset.cat === filterCat;
+        const matchCost = filterCost === 'all' || card.dataset.cost === filterCost;
+        const matchSearch = !search || card.dataset.name.includes(search);
+        const show = matchCat && matchCost && matchSearch;
+        card.classList.toggle('filter-hidden', !show);
+        if (show) visible++;
+      });
+
+      // Hide sections with no visible cards
+      document.querySelectorAll('.university-section').forEach(section => {
+        const anyVisible = section.querySelectorAll('.place-card:not(.filter-hidden)').length > 0;
+        section.classList.toggle('filter-hidden', !anyVisible);
+      });
+
+      const isFiltered = filterCat !== 'all' || filterCost !== 'all' || search;
+      document.getElementById('filterStatus').textContent = isFiltered ? `Showing ${visible} place${visible !== 1 ? 's' : ''}` : '';
+
+      if (leafletMap) updateMarkerVisibility();
+    }
+
+    // ---- Map ----
+    const COORDS = {
+      'princeton-art-museum':      [40.3453, -74.6574],
+      'palmer-square':             [40.3494, -74.6591],
+      'princeton-battlefield':     [40.3328, -74.6702],
+      'morven-museum':             [40.3460, -74.6641],
+      'mccarter-theatre':          [40.3472, -74.6570],
+      'dr-canal-state-park':       [40.3556, -74.6499],
+      'nassau-street':             [40.3495, -74.6590],
+      'mit-museum':                [42.3624, -71.0892],
+      'charles-river-esplanade':   [42.3592, -71.0700],
+      'kendall-square':            [42.3622, -71.0862],
+      'harvard-square':            [42.3730, -71.1190],
+      'museum-of-science':         [42.3679, -71.0714],
+      'freedom-trail':             [42.3554, -71.0583],
+      'fenway-park':               [42.3467, -71.0972],
+      'harvard-yard':              [42.3744, -71.1161],
+      'harvard-art-museums':       [42.3744, -71.1131],
+      'harvard-natural-history':   [42.3784, -71.1148],
+      'mount-auburn-cemetery':     [42.3724, -71.1428],
+      'harvard-square-district':   [42.3730, -71.1185],
+      'peabody-museum':            [42.3783, -71.1143],
+      'charles-river-bike-path':   [42.3690, -71.1094],
+      'cantor-arts-center':        [37.4343, -122.1677],
+      'hoover-tower':              [37.4265, -122.1670],
+      'stanford-dish-trail':       [37.4105, -122.1604],
+      'stanford-memorial-church':  [37.4264, -122.1671],
+      'computer-history-museum':   [37.4143, -122.0773],
+      'baylands-nature-preserve':  [37.4602, -122.1035],
+      'university-avenue-palo-alto':[37.4440, -122.1657],
+      'yale-art-gallery':          [41.3085, -72.9318],
+      'beinecke-library':          [41.3116, -72.9287],
+      'yale-peabody-museum':       [41.3197, -72.9253],
+      'new-haven-green':           [41.3082, -72.9248],
+      'wooster-street':            [41.2987, -72.9070],
+      'yale-british-art':          [41.3082, -72.9312],
+      'east-rock-park':            [41.3380, -72.9079],
+      'robie-house':               [41.7920, -87.5994],
+      'museum-science-industry':   [41.7906, -87.5830],
+      'promontory-point':          [41.7961, -87.5743],
+      'seminary-coop':             [41.7897, -87.5990],
+      'rockefeller-chapel':        [41.7882, -87.5997],
+      'osaka-garden':              [41.7830, -87.5820],
+      'court-theatre':             [41.7892, -87.5996],
+      'duke-gardens':              [36.0032, -78.9396],
+      'duke-chapel':               [36.0024, -78.9404],
+      'duke-lemur-center':         [36.0087, -78.9167],
+      'nasher-museum':             [36.0019, -78.9389],
+      'american-tobacco-campus':   [35.9925, -78.9014],
+      'durham-bulls':              [35.9979, -78.8842],
+      'eno-river':                 [36.0684, -79.0028],
+      'baltimore-museum-art':      [39.3263, -76.6185],
+      'peabody-library':           [39.2963, -76.6148],
+      'national-aquarium':         [39.2855, -76.6063],
+      'fort-mchenry':              [39.2634, -76.5796],
+      'camden-yards':              [39.2838, -76.6218],
+      'visionary-art-museum':      [39.2806, -76.6045],
+      'fells-point':               [39.2837, -76.5976],
+      'lake-michigan-shoreline':   [42.0576, -87.6741],
+      'block-museum':              [42.0568, -87.6755],
+      'grosse-point-lighthouse':   [42.0789, -87.6757],
+      'downtown-evanston':         [42.0473, -87.6814],
+      'mitchell-museum':           [42.0456, -87.6805],
+      'chicago-skyline':           [41.8781, -87.6298],
+      'shakespeare-garden':        [42.0578, -87.6746],
+      'penn-museum':               [39.9525, -75.1978],
+      'independence-hall':         [39.9490, -75.1500],
+      'philadelphia-museum-art':   [39.9657, -75.1809],
+      'reading-terminal-market':   [39.9526, -75.1586],
+      'schuylkill-river-trail':    [39.9615, -75.1820],
+      'barnes-foundation':         [39.9661, -75.1775],
+      'cira-green':                [39.9573, -75.1832]
+    };
+
+    const UNI_COLORS = {
+      'Princeton University':                         '#E77500',
+      'Massachusetts Institute of Technology (MIT)':  '#A31F34',
+      'Harvard University':                           '#A51C30',
+      'Stanford University':                          '#8C1515',
+      'Yale University':                              '#00356B',
+      'University of Chicago':                        '#800000',
+      'Duke University':                              '#003087',
+      'Johns Hopkins University':                     '#002D72',
+      'Northwestern University':                      '#4E2A84',
+      'University of Pennsylvania':                   '#011F5B'
+    };
+
+    let leafletMap = null;
+    let leafletMarkers = {};
+
+    function toggleMap() {
+      const panel = document.getElementById('mapPanel');
+      const btn = document.getElementById('mapToggleBtn');
+      const opening = !panel.classList.contains('visible');
+      panel.classList.toggle('visible', opening);
+      btn.classList.toggle('active', opening);
+      if (opening && !leafletMap) {
+        setTimeout(initMap, 370); // wait for CSS height transition to complete
+      } else if (opening && leafletMap) {
+        setTimeout(() => leafletMap.invalidateSize(), 370);
+      }
+    }
+
+    function initMap() {
+      const usBounds = [[24, -128], [50, -62]];
+      leafletMap = L.map('map', {
+        scrollWheelZoom: false,
+        minZoom: 4,
+        maxBounds: usBounds,
+        maxBoundsViscosity: 1.0
+      }).fitBounds(usBounds);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 18
+      }).addTo(leafletMap);
+
+      allPlaces.forEach((place, idx) => {
+        const coords = COORDS[place.slug];
+        if (!coords) return;
+        const marker = L.circleMarker(coords, {
+          radius: 7,
+          fillColor: UNI_COLORS[place.uniName] || '#6366f1',
+          color: '#ffffff', weight: 1.5,
+          fillOpacity: 0.85, opacity: 1
+        });
+        marker.bindPopup(`
+          <div class="map-popup-name">${place.name}</div>
+          <div class="map-popup-uni">${place.uniName}</div>
+          <button class="map-popup-btn" onclick="window._mapOpen(${idx})">View details →</button>
+        `);
+        marker.addTo(leafletMap);
+        leafletMarkers[place.slug] = marker;
+      });
+    }
+
+    window._mapOpen = function(idx) {
+      if (leafletMap) leafletMap.closePopup();
+      openModal(idx);
+    };
+
+    function updateMarkerVisibility() {
+      document.querySelectorAll('.place-card').forEach(card => {
+        const m = leafletMarkers[card.dataset.slug];
+        if (!m) return;
+        m.setStyle(card.classList.contains('filter-hidden')
+          ? { fillOpacity: 0.12, opacity: 0.3 }
+          : { fillOpacity: 0.85, opacity: 1 });
+      });
+    }
+
+    init();
+  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</body>
+</html>

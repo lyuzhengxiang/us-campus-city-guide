@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Gallery - US University Places</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-2: #27272a;
+      --border: #27272a;
+      --border-hover: #3f3f46;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- Gallery View ---- */
+    .gallery-view { padding: 3rem 2rem; max-width: 1400px; margin: 0 auto; }
+
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .gallery-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .gallery-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .gallery-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .gallery-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+
+    .card-preview {
+      width: 100%;
+      height: 260px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+
+    .card-preview iframe {
+      width: 1440px;
+      height: 900px;
+      border: none;
+      transform: scale(0.264);
+      transform-origin: top left;
+      pointer-events: none;
+    }
+
+    .card-preview-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .card-body { padding: 1.25rem; }
+
+    .card-version {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ---- Expanded View ---- */
+    .expanded-view {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .expanded-view.active {
+      display: flex;
+    }
+
+    .gallery-view.hidden { display: none; }
+
+    .expanded-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .back-btn:hover { background: var(--border); }
+
+    .expanded-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .expanded-title strong { color: var(--text); }
+
+    .nav-btns {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-btn:hover { background: var(--border); color: var(--text); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:disabled:hover { background: var(--surface-2); color: var(--text-muted); }
+
+    .expanded-iframe-container {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .expanded-iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-view { padding: 2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Gallery grid view -->
+  <div class="gallery-view" id="galleryView">
+    <div class="gallery-header">
+      <h1>Design Iterations</h1>
+      <p>Click any version to view it full-size. Use arrow keys to navigate between versions.</p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <!-- Expanded single-version view -->
+  <div class="expanded-view" id="expandedView">
+    <div class="expanded-topbar">
+      <button class="back-btn" onclick="closeExpanded()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        All Versions
+      </button>
+      <div class="expanded-title" id="expandedTitle"></div>
+      <div class="nav-btns">
+        <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="nav-btn" id="nextBtn" onclick="navigate(1)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="expanded-iframe-container" id="expandedContent"></div>
+  </div>
+
+  <script>
+    const VERSIONS = [
+      {
+        id: 'v1',
+        title: 'Dark Elegance',
+        description: 'Dark theme with indigo accents, card grid layout, hover animations, and sticky scroll-spy navigation.',
+        path: './v1/index.html'
+      },
+      {
+        id: 'v2',
+        title: 'Visual + Reviews',
+        description: 'Added place images from Wikimedia Commons, star ratings, and top visitor reviews with attribution.',
+        path: './v2/index.html'
+      },
+      {
+        id: 'v3',
+        title: 'Detail Modals + Expert Tips',
+        description: 'Click any place to open a full detail view with expert tips, practical info (hours, cost, duration), and "Don\'t Miss" highlights.',
+        path: './v3/index.html'
+      },
+      {
+        id: 'v4',
+        title: 'Search, Filter & Interactive Map',
+        description: 'Search and filter 70 places by name, category, and cost. Toggle an interactive Leaflet map showing all places as color-coded pins — click any pin to open its detail modal.',
+        path: './v4/index.html'
+      },
+      {
+        id: 'v5',
+        title: 'Warm Editorial',
+        description: 'Light cream background with terracotta accents and DM Serif Display headings. A warm, editorial aesthetic reminiscent of a travel magazine.',
+        path: './v5/index.html'
+      },
+      {
+        id: 'v6',
+        title: 'Deep Ocean',
+        description: 'Deep navy background with sky-blue accents and Space Grotesk typography. Clean, technical feel with cool ocean tones.',
+        path: './v6/index.html'
+      },
+      {
+        id: 'v7',
+        title: 'Neon Pulse',
+        description: 'Near-black background with vivid purple and fuchsia neon accents. Cyberpunk-inspired glow effects and Rajdhani headings.',
+        path: './v7/index.html'
+      },
+      {
+        id: 'v8',
+        title: 'Fresh Sage',
+        description: 'Crisp near-white background with forest green accents and Plus Jakarta Sans typography. Clean, natural, and airy.',
+        path: './v8/index.html'
+      },
+      {
+        id: 'v9',
+        title: 'Amber Noir',
+        description: 'Dark warm-black background with golden amber accents and Playfair Display headings. Luxurious, moody, and sophisticated.',
+        path: './v9/index.html'
+      },
+      {
+        id: 'v10',
+        title: 'Rose & Ivory',
+        description: 'Warm ivory background with crimson accents and Cormorant Garamond headings. Elegant and refined with a soft romantic palette.',
+        path: './v10/index.html'
+      },
+      {
+        id: 'v11',
+        title: 'Terminal / Hacker',
+        description: 'GitHub-dark palette with JetBrains Mono font, CRT scanline overlay, terminal window card chrome with traffic-light dots, blinking cursor on hero, and CLI --flag style filter pills.',
+        path: './v11/index.html'
+      },
+      {
+        id: 'v12',
+        title: 'Vintage WPA Poster',
+        description: 'Aged paper background, Anton bold display font, hard offset card shadows, ornamental ✦ DESTINATION ✦ section dividers, stamp-style badges. Inspired by 1930s travel poster aesthetics.',
+        path: './v12/index.html'
+      },
+      {
+        id: 'v13',
+        title: 'Aurora Glassmorphism',
+        description: 'Animated vivid aurora gradient fixed behind the entire page. All UI surfaces — nav, cards, filter bar, modals — use frosted glass (backdrop-filter: blur) with rgba transparency.',
+        path: './v13/index.html'
+      },
+      {
+        id: 'v14',
+        title: 'Web Brutalism',
+        description: 'Zero border-radius everywhere. Thick black borders, 6px hard offset drop shadows, stark off-white/black/red palette, uppercase typography. Aggressive hover states shift shadows to red.',
+        path: './v14/index.html'
+      },
+      {
+        id: 'v15',
+        title: 'Cosmic / Deep Space',
+        description: '25-star CSS radial-gradient starfield with twinkling animation, layered nebula glows, Sora font, planet-like card hover glow, and constellation · · ✦ · · decorations on section headers.',
+        path: './v15/index.html'
+      }
+    ];
+
+    let currentIndex = -1;
+
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = VERSIONS.map((v, i) => `
+        <div class="gallery-card" onclick="openVersion(${i})">
+          <div class="card-preview">
+            <iframe src="${v.path}" loading="lazy" tabindex="-1"></iframe>
+            <div class="card-preview-overlay"></div>
+          </div>
+          <div class="card-body">
+            <span class="card-version">Version ${i + 1}</span>
+            <h3 class="card-title">${v.title}</h3>
+            <p class="card-desc">${v.description}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openVersion(index) {
+      currentIndex = index;
+      const v = VERSIONS[index];
+
+      document.getElementById('galleryView').classList.add('hidden');
+      document.getElementById('expandedView').classList.add('active');
+      document.getElementById('expandedTitle').innerHTML = `<strong>v${index + 1}</strong> &mdash; ${v.title}`;
+      document.getElementById('expandedContent').innerHTML = `<iframe src="${v.path}"></iframe>`;
+
+      document.getElementById('prevBtn').disabled = index === 0;
+      document.getElementById('nextBtn').disabled = index === VERSIONS.length - 1;
+    }
+
+    function closeExpanded() {
+      document.getElementById('galleryView').classList.remove('hidden');
+      document.getElementById('expandedView').classList.remove('active');
+      currentIndex = -1;
+    }
+
+    function navigate(dir) {
+      const next = currentIndex + dir;
+      if (next >= 0 && next < VERSIONS.length) openVersion(next);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (currentIndex === -1) return;
+      if (e.key === 'Escape') closeExpanded();
+      if (e.key === 'ArrowLeft') navigate(-1);
+      if (e.key === 'ArrowRight') navigate(1);
+    });
+
+    renderGallery();
+  </script>
+</body>
+</html>
