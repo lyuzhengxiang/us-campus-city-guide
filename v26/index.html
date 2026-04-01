@@ -3,45 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus Map Explorer</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>US University Map</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #0a0a12; --surface: #141420; --surface-2: #1e1e2e;
-      --border: #2a2a3a; --text: #f0f0f5; --text-muted: #8888aa; --accent: #6366f1;
+      --bg: #020d1a; --surface: #0a1628; --surface-2: #122040;
+      --border: #1a3050; --text: #e8f0f8; --text-muted: #6a8aaa; --accent: #4a90d9;
     }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
-    .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 1.5rem; z-index: 1000; position: relative; }
+    .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; flex-shrink: 0; z-index: 10; }
     .logo { font-size: 1rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
-    .logo svg { flex-shrink: 0; }
-    #map { height: calc(100vh - 52px); width: 100%; z-index: 1; }
-    .leaflet-container { background: #0a0a12; }
+    .back-btn { display: none; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit; align-items: center; gap: 0.3rem; }
+    .back-btn:hover { background: var(--border); }
+    .back-btn.visible { display: inline-flex; }
+    .legend { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.65rem; color: var(--text-muted); cursor: pointer; }
+    .legend-item:hover { color: var(--text); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    #map-container { height: calc(100vh - 52px); position: relative; overflow: hidden; }
+    #map-svg { width: 100%; height: 100%; }
+    .state { fill: #0f2840; stroke: #1f3a5a; stroke-width: 0.5px; transition: fill 0.2s; }
+    .state:hover { fill: #15345a; }
+    .pin-glow { pointer-events: none; }
+    .pin { cursor: pointer; transition: r 0.2s; }
 
-    /* Bottom panel */
-    .bottom-panel {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 1001;
-      background: var(--surface); border-top: 1px solid var(--border);
-      transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      max-height: 45vh; display: flex; flex-direction: column;
-      border-radius: 16px 16px 0 0;
+    /* Right panel */
+    #place-panel {
+      position: absolute; top: 0; right: 0; width: 0; height: 100%;
+      background: var(--surface); border-left: 1px solid var(--border);
+      overflow: hidden; transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; z-index: 5;
     }
-    .bottom-panel.open { transform: translateY(0); }
-    .panel-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .panel-uni { font-size: 1.1rem; font-weight: 700; }
-    .panel-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
-    .panel-back { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.4rem 0.9rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 0.4rem; }
-    .panel-back:hover { background: var(--border); }
-    .panel-cards-wrap { flex: 1; overflow-x: auto; overflow-y: hidden; padding: 1rem 1.5rem; display: flex; gap: 1rem; scroll-snap-type: x mandatory; }
-    .panel-cards-wrap::-webkit-scrollbar { height: 4px; } .panel-cards-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .pcard { flex-shrink: 0; width: 220px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s; scroll-snap-align: start; }
-    .pcard:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    .pcard-img { width: 100%; height: 120px; object-fit: cover; }
-    .pcard-body { padding: 0.75rem; }
-    .pcard-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.3rem; }
-    .pcard-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; gap: 0.5rem; }
-    .pcard-cost { color: #40d090; font-weight: 600; }
+    #place-panel.open { width: 380px; }
+    .panel-header { padding: 1.25rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .panel-uni-name { font-size: 1.05rem; font-weight: 700; }
+    .panel-count { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .panel-cards { flex: 1; overflow-y: auto; padding: 0.5rem; }
+    .panel-cards::-webkit-scrollbar { width: 4px; } .panel-cards::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .panel-card { display: flex; gap: 0.75rem; padding: 0.75rem; border-radius: 10px; cursor: pointer; transition: background 0.15s; align-items: center; }
+    .panel-card:hover { background: var(--surface-2); }
+    .panel-card-img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .panel-card-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.1rem; }
+    .panel-card-meta { font-size: 0.7rem; color: var(--text-muted); }
 
 
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 2rem; }
@@ -80,31 +84,34 @@
     .modal-review { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; font-style: italic; font-size: 0.88rem; line-height: 1.7; }
     .reviewer { font-style: normal; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; }
 
+    @media (max-width: 768px) { .legend { display: none; } #place-panel.open { width: 100%; } }
   </style>
 </head>
 <body>
   <div class="topbar">
     <div class="logo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Campus Map Explorer
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      US University Explorer
     </div>
+    <button class="back-btn" id="backBtn" onclick="zoomOut()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      All Universities
+    </button>
+    <div class="legend" id="legend"></div>
   </div>
-  <div id="map"></div>
-  <div class="bottom-panel" id="bottomPanel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-uni" id="panelUni"></div>
+  <div id="map-container">
+    <svg id="map-svg"></svg>
+    <div id="place-panel">
+      <div class="panel-header">
+        <div class="panel-uni-name" id="panelUniName"></div>
         <div class="panel-count" id="panelCount"></div>
       </div>
-      <button class="panel-back" onclick="closePanel()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        All Universities
-      </button>
+      <div class="panel-cards" id="panelCards"></div>
     </div>
-    <div class="panel-cards-wrap" id="panelCards"></div>
   </div>
   <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modal"></div></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <script>
 
     const DATA = {"universities":[
@@ -217,16 +224,16 @@
 
 
     const UNI_COORDS = {
-      'Princeton University': [40.3573, -74.6672],
-      'Massachusetts Institute of Technology (MIT)': [42.3601, -71.0942],
-      'Harvard University': [42.3770, -71.1167],
-      'Stanford University': [37.4275, -122.1697],
-      'Yale University': [41.3163, -72.9223],
-      'University of Chicago': [41.7897, -87.5997],
-      'Duke University': [36.0014, -78.9382],
-      'Johns Hopkins University': [39.3299, -76.6205],
-      'Northwestern University': [42.0565, -87.6753],
-      'University of Pennsylvania': [39.9522, -75.1932]
+      'Princeton University': [-74.6672, 40.3573],
+      'Massachusetts Institute of Technology (MIT)': [-71.0942, 42.3601],
+      'Harvard University': [-71.1167, 42.3770],
+      'Stanford University': [-122.1697, 37.4275],
+      'Yale University': [-72.9223, 41.3163],
+      'University of Chicago': [-87.5997, 41.7897],
+      'Duke University': [-78.9382, 36.0014],
+      'Johns Hopkins University': [-76.6205, 39.3299],
+      'Northwestern University': [-87.6753, 42.0565],
+      'University of Pennsylvania': [-75.1932, 39.9522]
     };
 
     let allPlaces = [];
@@ -302,72 +309,136 @@
       if (e.key === 'ArrowRight') navModal(1);
     });
 
-    // ── Map setup ──
-    const usBounds = [[24, -128], [50, -62]];
-    const map = L.map('map', { zoomControl: true, minZoom: 4, maxBounds: [[10, -180], [75, -30]], maxBoundsViscosity: 1.0 });
-    map.fitBounds(usBounds);
-
-    // Dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd', maxZoom: 19
-    }).addTo(map);
-
-    // Add university markers
-    const markers = {};
-    Object.entries(UNI_COORDS).forEach(([uni, coords]) => {
-      const color = UNI_COLORS[uni] || '#6366f1';
-      const count = uniCounts[uni] || 7;
-      const r = 8 + Math.sqrt(count) * 1.5;
-
-      const marker = L.circleMarker(coords, {
-        radius: r, fillColor: color, color: '#ffffff', weight: 2,
-        fillOpacity: 0.85, opacity: 1
-      }).addTo(map);
-
-      // Label
+    // ── Legend ──
+    const legendEl = document.getElementById('legend');
+    legendEl.innerHTML = Object.keys(UNI_COORDS).map(uni => {
+      const c = UNI_COLORS[uni] || '#6366f1';
       const short = uni.replace(' University','').replace('Massachusetts Institute of Technology (MIT)','MIT').replace('University of ','');
-      marker.bindTooltip(short, { permanent: false, direction: 'top', className: 'uni-tooltip' });
+      return `<div class="legend-item" onclick="zoomToUni('${uni.replace(/'/g,"\\'")}')"><div class="legend-dot" style="background:${c}"></div>${short}</div>`;
+    }).join('');
 
-      marker.on('click', () => {
-        map.flyTo(coords, 13, { duration: 1.5 });
-        openPanel(uni);
+    // ── D3 Map ──
+    const container = document.getElementById('map-container');
+    let W = container.clientWidth, H = container.clientHeight;
+    const svg = d3.select('#map-svg').attr('width', W).attr('height', H);
+    const g = svg.append('g');
+
+    const projection = d3.geoAlbersUsa().fitSize([W, H], { type: 'Sphere' });
+    const pathGen = d3.geoPath().projection(projection);
+
+    let currentZoom = d3.zoomIdentity;
+    let activeUni = null;
+
+    const zoom = d3.zoom()
+      .scaleExtent([1, 12])
+      .on('zoom', (e) => { g.attr('transform', e.transform); currentZoom = e.transform; });
+    svg.call(zoom);
+
+    // Load US states
+    d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us => {
+      const states = topojson.feature(us, us.objects.states);
+      const borders = topojson.mesh(us, us.objects.states, (a, b) => a !== b);
+
+      g.selectAll('.state')
+        .data(states.features)
+        .enter().append('path')
+        .attr('class', 'state')
+        .attr('d', pathGen);
+
+      g.append('path')
+        .datum(borders)
+        .attr('fill', 'none')
+        .attr('stroke', '#1f3a5a')
+        .attr('stroke-width', 0.5)
+        .attr('d', pathGen);
+
+      renderPins();
+    });
+
+    function renderPins() {
+      Object.entries(UNI_COORDS).forEach(([uni, coords]) => {
+        const pt = projection(coords);
+        if (!pt) return;
+        const [x, y] = pt;
+        const color = UNI_COLORS[uni] || '#6366f1';
+        const count = uniCounts[uni] || 7;
+        const r = 5 + Math.sqrt(count);
+
+        // Glow
+        g.append('circle').attr('class', 'pin-glow')
+          .attr('cx', x).attr('cy', y).attr('r', r + 4)
+          .attr('fill', color).attr('fill-opacity', 0.2);
+
+        // Pin
+        g.append('circle').attr('class', 'pin')
+          .attr('cx', x).attr('cy', y).attr('r', r)
+          .attr('fill', color).attr('stroke', '#fff').attr('stroke-width', 1.5)
+          .attr('opacity', 0.9)
+          .on('click', (e) => { e.stopPropagation(); zoomToUni(uni); });
+
+        // Label (visible only when zoomed out)
+        const short = uni.replace(' University','').replace('Massachusetts Institute of Technology (MIT)','MIT').replace('University of ','');
+        g.append('text')
+          .attr('class', 'pin-label')
+          .attr('x', x).attr('y', y - r - 6)
+          .attr('text-anchor', 'middle')
+          .attr('fill', color)
+          .attr('font-size', '8px')
+          .attr('font-weight', '600')
+          .attr('font-family', 'Inter, sans-serif')
+          .text(short);
       });
+    }
 
-      markers[uni] = marker;
+    function zoomToUni(uni) {
+      const coords = UNI_COORDS[uni];
+      if (!coords) return;
+      const pt = projection(coords);
+      if (!pt) return;
+      activeUni = uni;
+
+      const scale = 6;
+      const tx = W / 2 - pt[0] * scale;
+      const ty = H / 2 - pt[1] * scale;
+      const t = d3.zoomIdentity.translate(tx, ty).scale(scale);
+
+      svg.transition().duration(750).call(zoom.transform, t);
+      openPanel(uni);
+      document.getElementById('backBtn').classList.add('visible');
+    }
+
+    function zoomOut() {
+      activeUni = null;
+      svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+      document.getElementById('place-panel').classList.remove('open');
+      document.getElementById('backBtn').classList.remove('visible');
+    }
+
+    // Click background to zoom out
+    svg.on('click', () => {
+      if (activeUni) zoomOut();
     });
 
     // ── Panel ──
     function openPanel(uni) {
       const items = uniPlaces[uni] || [];
-      document.getElementById('panelUni').textContent = uni;
+      document.getElementById('panelUniName').textContent = uni;
       document.getElementById('panelCount').textContent = items.length + ' places to visit';
       document.getElementById('panelCards').innerHTML = items.map(({place, idx}) => {
         const t = TIPS[place.slug] || {};
-        return `<div class="pcard" onclick="openModal(${idx})">
-          <img class="pcard-img" src="../images/${place.image}" alt="${place.name}" loading="lazy">
-          <div class="pcard-body">
-            <div class="pcard-name">${place.name}</div>
-            <div class="pcard-meta">
-              <span>${place.type}</span>
-              <span class="pcard-cost">${t.cost || 'Free'}</span>
-            </div>
-          </div>
-        </div>`;
+        return `<div class="panel-card" onclick="openModal(${idx})">
+          <img class="panel-card-img" src="../images/${place.image}" alt="${place.name}" loading="lazy">
+          <div><div class="panel-card-name">${place.name}</div>
+          <div class="panel-card-meta">${place.type} \u00b7 ${t.cost || 'Free'}</div></div></div>`;
       }).join('');
-      document.getElementById('bottomPanel').classList.add('open');
+      document.getElementById('place-panel').classList.add('open');
     }
 
-    function closePanel() {
-      document.getElementById('bottomPanel').classList.remove('open');
-      map.flyToBounds(usBounds, { duration: 1.2 });
-    }
-
-    // Close panel on map click (not marker)
-    map.on('click', (e) => {
-      if (document.getElementById('bottomPanel').classList.contains('open')) {
-        closePanel();
-      }
+    // Resize
+    window.addEventListener('resize', () => {
+      W = container.clientWidth; H = container.clientHeight;
+      svg.attr('width', W).attr('height', H);
+      projection.fitSize([W, H], { type: 'Sphere' });
     });
 
   </script>
