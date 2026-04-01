@@ -49,6 +49,88 @@
       font-size: 0.95rem;
     }
 
+    /* Section headers */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .gallery-section {
+      margin-bottom: 3.5rem;
+    }
+
+    /* Featured card (final design) */
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      max-width: 800px;
+    }
+
+    .featured-card {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .featured-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(99, 102, 241, 0.2);
+    }
+
+    .featured-card .card-preview {
+      height: 340px;
+    }
+
+    .featured-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .featured-card .card-title {
+      font-size: 1.2rem;
+    }
+
+    /* Top picks grid */
+    .picks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .picks-grid .gallery-card {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Divider */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 3rem;
+    }
+
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -217,7 +299,34 @@
       <h1>Design Iterations</h1>
       <p>Click any version to view it full-size. Use arrow keys to navigate between versions.</p>
     </div>
-    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <!-- Final Design -->
+    <div class="gallery-section">
+      <span class="section-label">Final Design</span>
+      <h2 class="section-title">Vector US Map</h2>
+      <p class="section-desc">The chosen design — a stylized D3 vector map of the US with animated zoom interactions.</p>
+      <div class="featured-grid" id="featuredGrid"></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Top Designs -->
+    <div class="gallery-section">
+      <span class="section-label">Top Picks</span>
+      <h2 class="section-title">Best Designs</h2>
+      <p class="section-desc">Standout versions with the most distinctive layouts and interactions.</p>
+      <div class="picks-grid" id="picksGrid"></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- All Versions -->
+    <div class="gallery-section">
+      <span class="section-label">All Versions</span>
+      <h2 class="section-title">Complete Gallery</h2>
+      <p class="section-desc">All 26 design iterations from start to finish.</p>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
   </div>
 
   <!-- Expanded single-version view -->
@@ -400,23 +509,42 @@
       }
     ];
 
+    const FINAL_ID = 'v26';
+    const TOP_IDS = ['v25', 'v26', 'v14', 'v21'];
+
     let currentIndex = -1;
 
-    function renderGallery() {
-      const grid = document.getElementById('galleryGrid');
-      grid.innerHTML = VERSIONS.map((v, i) => `
-        <div class="gallery-card" onclick="openVersion(${i})">
+    function makeCard(v, i, extraClass) {
+      return `<div class="${extraClass || 'gallery-card'}" onclick="openVersion(${i})">
           <div class="card-preview">
             <iframe src="${v.path}" loading="lazy" tabindex="-1"></iframe>
             <div class="card-preview-overlay"></div>
           </div>
           <div class="card-body">
-            <span class="card-version">Version ${i + 1}</span>
+            <span class="card-version">${v.id.toUpperCase()}</span>
             <h3 class="card-title">${v.title}</h3>
             <p class="card-desc">${v.description}</p>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+    }
+
+    function renderGallery() {
+      // Final design
+      const finalIdx = VERSIONS.findIndex(v => v.id === FINAL_ID);
+      if (finalIdx !== -1) {
+        document.getElementById('featuredGrid').innerHTML = makeCard(VERSIONS[finalIdx], finalIdx, 'featured-card');
+      }
+
+      // Top picks
+      const picksHtml = TOP_IDS.map(id => {
+        const i = VERSIONS.findIndex(v => v.id === id);
+        return i !== -1 ? makeCard(VERSIONS[i], i, 'gallery-card') : '';
+      }).join('');
+      document.getElementById('picksGrid').innerHTML = picksHtml;
+
+      // All versions
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = VERSIONS.map((v, i) => makeCard(v, i, 'gallery-card')).join('');
     }
 
     function openVersion(index) {
