@@ -1708,6 +1708,9 @@
       uniPlaces[p.uniName].push({ place: p, idx });
     });
 
+    // Save modal element before wiping DOM (openModal references it)
+    const savedModal = document.getElementById('modalOverlay');
+
     // Build player shell
     document.body.innerHTML = `
       <div class="player-shell">
@@ -1744,6 +1747,9 @@
         </div>
       </div>
     `;
+
+    // Re-attach modal so openModal() still works
+    if (savedModal) document.body.appendChild(savedModal);
 
     // Load first album
     loadAlbum(uniOrder[0], uniPlaces[uniOrder[0]]);
